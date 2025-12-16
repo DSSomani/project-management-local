@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <title>Project Manager</title>
+    <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="view-tabs">
+                <button class="view-tab active" id="activeTab" onclick="switchView('active')">
+                    <span style="display:inline-block; width:10px; height:10px; background:#28c76f; border-radius:50%; animation:pulse 1.5s infinite;"></span> Active
+                </button>
+                <button class="view-tab" id="archivedTab" onclick="switchView('archived')">
+                    <span style=" display:inline-block; width:10px; height:10px; background:#9ca3af; /* Grey */ border-radius:50%;">
+                    </span>Archived
+                </button>
+                <button class="view-tab" id="habitsTab" onclick="switchView('habits')">
+                    <span style=" display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%;"></span> Habits
+                </button>
+            </div>
+            <div id="projectsSection">
+                <ul class="project-list" id="projectList"></ul>
+                <button class="btn-new-project" onclick="openNewProjectModal()">+ New Project</button>
+            </div>
+            <div id="habitsSidebar" class="habits-sidebar" style="display: none;">
+                <div class="habits-date-nav">
+                    <button class="btn-nav" onclick="changeHabitDate(-1)">◀</button>
+                    <span id="habitDateDisplay">Today</span>
+                    <button class="btn-nav" onclick="changeHabitDate(1)">▶</button>
+                </div>
+                <div class="habits-streak-info">
+                    <div class="streak-item">
+                        <span class="streak-icon"><i class="fa-solid fa-fire"></i></span>
+                         
+                        <span id="currentStreak">0</span>
+                        <span class="streak-label">Current</span>
+                    </div>
+                    <div class="streak-item">
+                        <span class="streak-icon">⭐</span>
+                        <span id="bestStreak">0</span>
+                        <span class="streak-label">Best</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: center;">
+                    <h1 id="projectTitle">Select a Project</h1>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                            <span style="display:inline-flex; width:12px; height:12px; border-radius:50%; background:linear-gradient(90deg, #817d6f 50%, #1e293b 50%);"></span>
+                        </button>
+                        <button class="btn-small" onclick="logout()" title="Sign Out" style="padding: 8px 12px; font-size: 13px;">
+                            <span style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:2px;"></span> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="content" id="content">
+                <div class="task-list">
+                    <div class="empty-state">
+                        <span class="icon-dot icon-dot-success"></span>
+                        <p> Select a project to get started</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="modal" id="newProjectModal">
+        <div class="modal-content">
+            <div class="modal-header">New Project</div>
+            <form onsubmit="createProject(event)">
+                <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" id="projectNameInput" class="form-input" placeholder="e.g., Website Redesign"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="projectDescInput" class="form-textarea"
+                        placeholder="Project description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Ending Date (Optional)</label>
+                    <input type="date" id="projectEndDateInput" class="form-input">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Days left counter will only show if you add an expected ending date
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Create Project</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('newProjectModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Project Modal -->
+    <div class="modal" id="editProjectModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Project</div>
+            <form onsubmit="updateProject(event)">
+                <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" id="editProjectNameInput" class="form-input" placeholder="e.g., Website Redesign"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="editProjectDescInput" class="form-textarea"
+                        placeholder="Project description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Ending Date (Optional)</label>
+                    <input type="date" id="editProjectEndDateInput" class="form-input">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Days left counter will only show if you add an expected ending date
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Update Project</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editProjectModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div class="modal" id="newTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">Add Task/Issue</div>
+            <form onsubmit="createTask(event)">
+                <div class="form-group">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" id="taskTitleInput" class="form-input" placeholder="e.g., Fix login bug"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="taskDescInput" class="form-textarea" placeholder="Task description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Hours</label>
+                    <input type="number" id="taskExpectedHoursInput" class="form-input" placeholder="e.g., 8" min="0"
+                        step="0.5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Ending Date (Optional)</label>
+                    <input type="date" id="taskEndDateInput" class="form-input">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Days left counter will only show if you add an expected ending date
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Add Task</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('newTaskModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div class="modal" id="editTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Task</div>
+            <form onsubmit="updateTask(event)">
+                <input type="hidden" id="editTaskId">
+                <div class="form-group">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" id="editTaskTitleInput" class="form-input" placeholder="e.g., Fix login bug"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="editTaskDescInput" class="form-textarea" placeholder="Task description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Hours</label>
+                    <input type="number" id="editTaskExpectedHoursInput" class="form-input" placeholder="e.g., 8" min="0"
+                        step="0.5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Ending Date (Optional)</label>
+                    <input type="date" id="editTaskEndDateInput" class="form-input">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Days left counter will only show if you add an expected ending date
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Update Task</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editTaskModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Session Modal -->
+    <div class="modal" id="newSessionModal">
+        <div class="modal-content">
+            <div class="modal-header">Add Session</div>
+            <form onsubmit="createSession(event)">
+                <div class="form-group">
+                    <label class="form-label">Session No</label>
+                    <input type="number" id="sessionNoInput" class="form-input" min="1" placeholder="e.g., 1" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Session name (Not required)</label>
+                    <input type="text" id="sessionNameInput" class="form-input" placeholder="e.g., Design review">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">Optional — give this session a short descriptive name.</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Started At</label>
+                    <input type="datetime-local" id="startedAtInput" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ended At</label>
+                    <input type="datetime-local" id="endedAtInput" class="form-input">
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Leave empty to create a running session
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Related Task</label>
+                    <select id="relatedTaskInput" class="form-select"></select>
+                    <small style="font-size: 12px; color: var(--color-text-light); display: block; margin-top: 4px;">
+                        Select (Unassigned) for project-level sessions
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (auto-calculated)</label>
+                    <input type="text" id="durationDisplay" class="form-input" readonly>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Save Session</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('newSessionModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Habit Modal -->
+    <div class="modal" id="newHabitModal">
+        <div class="modal-content">
+            <div class="modal-header">Add New Habit</div>
+            <form onsubmit="createHabit(event)">
+                <div class="form-group">
+                    <label class="form-label">Habit Name</label>
+                    <input type="text" id="habitNameInput" class="form-input" placeholder="e.g., Morning workout" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="habitCategoryInput" class="form-select" required>
+                        <option value="physical">💪 Physical Win</option>
+                        <option value="mental">🧠 Mental Win</option>
+                        <option value="financial">💰 Financial Win</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon (Optional)</label>
+                    <input type="text" id="habitIconInput" class="form-input" placeholder="e.g., 🏃‍♂️ (leave empty for default)">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-primary">Add Habit</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('newHabitModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Dialog -->
+    <div class="custom-dialog" id="customDialog">
+        <div class="custom-dialog-content">
+            <div class="custom-dialog-title" id="dialogTitle"></div>
+            <div class="custom-dialog-message" id="dialogMessage"></div>
+            <div class="custom-dialog-buttons">
+                <button class="dialog-btn dialog-btn-cancel" id="dialogCancel">Cancel</button>
+                <button class="dialog-btn dialog-btn-ok" id="dialogOk">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
