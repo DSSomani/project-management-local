@@ -2325,7 +2325,7 @@ function renderHabitsContent() {
     content.innerHTML = `
         <div class="habits-container">
             <div class="habits-header">
-                <h2>🎯 Daily Habits</h2>
+                <h2>Today's Goals</h2>
                 <button class="btn-primary" onclick="openNewHabitModal()">+ Add Habit</button>
             </div>
             

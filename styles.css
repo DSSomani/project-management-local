@@ -963,7 +963,7 @@ input[type="reset"],
 }
 
 .btn-primary {
-    flex: 1;
+    /* flex: 1; */
     padding: var(--space-12) var(--space-20);
     background: var(--color-primary);
     color: white;
