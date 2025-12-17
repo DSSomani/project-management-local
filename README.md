@@ -3,8 +3,6 @@ Lightweight, browser-based Project Manager and Time Tracker (100% Offline)
 
 This is a **local-only version** - a single-page web app with NO server required. All data is stored locally in your browser (localStorage). Perfect for personal use, offline scenarios, or when you want complete data privacy.
 
-> **Note:** A Supabase-enabled version with cloud sync and multi-user support is available in a separate branch.
-
 ---
 
 ## Demo / Quick usage
