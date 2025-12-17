@@ -15,14 +15,65 @@
             background: var(--color-bg);
             padding: 20px;
         }
-        
+
+        /* Wider card with a two-column split layout */
         .login-card {
             background: var(--color-surface);
             border-radius: 12px;
-            padding: 40px;
+            padding: 0; /* grid children will handle spacing */
             width: 100%;
-            max-width: 400px;
+            max-width: 860px; /* wider to accommodate two columns */
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        /* Left column: Data Storage features */
+        .login-features {
+            padding: 32px 28px;
+            background: var(--color-bg-card); /* subtle highlight */
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .login-features h2 {
+            font-family: 'Space Mono', monospace; /* match heading font */
+            font-size: 20px;
+            margin: 0 0 8px 0;
+            color: var(--color-text-dark);
+            font-weight: 700;
+        }
+
+        .storage-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .storage-list li {
+            font-size: 14px;
+            color: var(--color-text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Right column: keep existing form layout exactly as-is */
+        .login-form-wrap {
+            padding: 40px;
+            background: var(--color-surface);
+            min-width: 300px;
         }
         
         .login-header {
@@ -125,6 +176,14 @@
             font-size: 13px;
             margin: 0;
         }
+
+        /* Responsive: stack columns on small screens */
+        @media (max-width: 720px) {
+            .login-card { max-width: 520px; }
+            .login-grid { grid-template-columns: 1fr; }
+            .login-features { border-right: none; border-bottom: 1px solid var(--color-border); }
+            .login-form-wrap { padding: 24px; }
+        }
         
         /* Dark theme adjustments */
         @media (prefers-color-scheme: dark) {
@@ -139,46 +198,60 @@
 <body>
     <div class="login-container">
         <div class="login-card">
-            <div class="login-header">
-                <h1>Project Manager</h1>
-                <p>Sign in to access your projects and habits</p>
-            </div>
-            
-            <div class="login-error" id="loginError"></div>
-            
-            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="form-input" 
-                        placeholder="you@example.com" 
-                        required
-                        autocomplete="email"
-                    >
+            <div class="login-grid">
+                <div class="login-features">
+                    <h2>Data Storage</h2>
+                    <p style="color:var(--color-text-light); margin:0;">Where your data lives:</p>
+                    <ul class="storage-list" aria-hidden="false">
+                        <li>- All data stored in browser's localStorage</li>
+                        <li>- Data persists until manually cleared</li>
+                        <li>- No network requests for data operations</li>
+                        <li>- Complete offline functionality</li>
+                    </ul>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="form-input" 
-                        placeholder="••••••••" 
-                        required
-                        autocomplete="current-password"
-                    >
+                <div class="login-form-wrap">
+                    <div class="login-header">
+                        <h1>Project Manager</h1>
+                        <p>Sign in to access your projects and habits</p>
+                    </div>
+                    
+                    <div class="login-error" id="loginError"></div>
+                    
+                    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                class="form-input" 
+                                placeholder="you@example.com" 
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-input" 
+                                placeholder="••••••••" 
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+                        
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="login-footer">
+                        <p>For access</p>
+                        <p>use demo@local.com / demo123 or admin@local.com / admin123</p>
+                    </div>
                 </div>
-                
-                <button type="submit" class="login-btn" id="loginBtn">
-                    Sign In
-                </button>
-            </form>
-            
-            <div class="login-footer">
-                <p>For access</p>
-                <p>use demo@local.com / demo123 or admin@local.com / admin123</p>
             </div>
         </div>
     </div>
