@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     <title>Login - Project Manager</title>
     <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
     <style>
@@ -15,37 +17,100 @@
             background: var(--color-bg);
             padding: 20px;
         }
-        
+
+        /* Wider card with a two-column split layout */
         .login-card {
             background: var(--color-surface);
             border-radius: 12px;
-            padding: 40px;
+            padding: 0;
+            /* grid children will handle spacing */
             width: 100%;
-            max-width: 400px;
+            max-width: 860px;
+            /* wider to accommodate two columns */
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        
+
+        .login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            align-items: stretch;
+        }
+
+        /* Left column: Data Storage features */
+        .login-features {
+            padding: 32px 28px;
+            background: var(--color-bg-card);
+            /* subtle highlight */
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .login-features h2 {
+            font-family: 'Space Mono', monospace;
+            /* match heading font */
+            font-size: 20px;
+            margin: 0 0 8px 0;
+            color: var(--color-text-dark);
+            font-weight: 700;
+        }
+
+        .storage-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .storage-list li {
+            font-size: 14px;
+            color: var(--color-text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Check icon styling for storage list */
+        .storage-list svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            color: var(--color-text-dark);
+        }
+
+        /* Right column: keep existing form layout exactly as-is */
+        .login-form-wrap {
+            padding: 40px;
+            background: var(--color-surface);
+            min-width: 300px;
+        }
+
         .login-header {
             text-align: center;
             margin-bottom: 32px;
         }
-        
+
         .login-header h1 {
             font-size: 28px;
             color: var(--color-text);
             margin: 0 0 8px 0;
         }
-        
+
         .login-header p {
             color: var(--color-text-light);
             margin: 0;
             font-size: 14px;
         }
-        
+
         .login-form .form-group {
             margin-bottom: 20px;
         }
-        
+
         .login-form .form-label {
             display: block;
             margin-bottom: 8px;
@@ -53,7 +118,7 @@
             color: var(--color-text);
             font-size: 14px;
         }
-        
+
         .login-form .form-input {
             width: 100%;
             padding: 12px 16px;
@@ -65,13 +130,13 @@
             transition: border-color 0.2s, box-shadow 0.2s;
             box-sizing: border-box;
         }
-        
+
         .login-form .form-input:focus {
             outline: none;
             border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
-        
+
         .login-btn {
             width: 100%;
             padding: 14px 24px;
@@ -84,20 +149,20 @@
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
         }
-        
+
         .login-btn:hover {
             background: var(--color-primary-hover);
         }
-        
+
         .login-btn:active {
             transform: scale(0.98);
         }
-        
+
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         .login-error {
             background: #fef2f2;
             border: 1px solid #fecaca;
@@ -108,24 +173,44 @@
             font-size: 14px;
             display: none;
         }
-        
+
         .login-error.show {
             display: block;
         }
-        
+
         .login-footer {
             text-align: center;
             margin-top: 24px;
             padding-top: 24px;
             border-top: 1px solid var(--color-border);
         }
-        
+
         .login-footer p {
             color: var(--color-text-light);
             font-size: 13px;
             margin: 0;
         }
-        
+
+        /* Responsive: stack columns on small screens */
+        @media (max-width: 720px) {
+            .login-card {
+                max-width: 520px;
+            }
+
+            .login-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-features {
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            .login-form-wrap {
+                padding: 24px;
+            }
+        }
+
         /* Dark theme adjustments */
         @media (prefers-color-scheme: dark) {
             .login-error {
@@ -136,48 +221,77 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
-            <div class="login-header">
-                <h1>🚀 Project Manager</h1>
-                <p>Sign in to access your projects and habits</p>
-            </div>
-            
-            <div class="login-error" id="loginError"></div>
-            
-            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        class="form-input" 
-                        placeholder="you@example.com" 
-                        required
-                        autocomplete="email"
-                    >
+            <div class="login-grid">
+                <div class="login-features">
+                    <h2>Data Storage</h2>
+                    <p style="color:var(--color-text-light); margin:0;">Where your data lives:</p>
+                    <ul class="storage-list" aria-hidden="false">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <path d="M4 12l5 5L20 6" />
+                            </svg>
+                            All data stored in browser's localStorage
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <path d="M4 12l5 5L20 6" />
+                            </svg>
+                            Data persists until manually cleared
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <path d="M4 12l5 5L20 6" />
+                            </svg>
+                            No network requests for data operations
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <path d="M4 12l5 5L20 6" />
+                            </svg>
+                            Complete offline functionality
+                        </li>
+                    </ul>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="form-input" 
-                        placeholder="••••••••" 
-                        required
-                        autocomplete="current-password"
-                    >
+
+                <div class="login-form-wrap">
+                    <div class="login-header">
+                        <h1>Project Manager</h1>
+                        <p>Sign in to access your projects and habits</p>
+                    </div>
+
+                    <div class="login-error" id="loginError"></div>
+
+                    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="you@example.com" required
+                                autocomplete="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" id="password" class="form-input" placeholder="••••••••" required
+                                autocomplete="current-password">
+                        </div>
+
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            Sign In
+                        </button>
+                    </form>
+
+                    <div class="login-footer">
+                        <p>For access</p>
+                        <p>use demo@local.com / demo123 or admin@local.com / admin123</p>
+                    </div>
                 </div>
-                
-                <button type="submit" class="login-btn" id="loginBtn">
-                    Sign In
-                </button>
-            </form>
-            
-            <div class="login-footer">
-                <p>🔒 Invite only • Contact admin for access</p>
             </div>
         </div>
     </div>
@@ -188,7 +302,7 @@
             'demo@local.com': { password: 'demo123', name: 'Demo User' },
             'admin@local.com': { password: 'admin123', name: 'Admin User' }
         };
-        
+
         // Check if already logged in
         function checkAuth() {
             const currentUser = localStorage.getItem('currentUser');
@@ -197,60 +311,60 @@
                 window.location.href = 'index.html';
             }
         }
-        
+
         // Handle login form submission
         function handleLogin(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             const errorDiv = document.getElementById('loginError');
-            
+
             // Hide previous errors
             errorDiv.classList.remove('show');
-            
+
             // Disable button during login
             loginBtn.disabled = true;
             loginBtn.textContent = 'Signing in...';
-            
+
             try {
                 // Check credentials
                 const user = DEMO_USERS[email];
-                
+
                 if (!user || user.password !== password) {
                     throw new Error('Invalid email or password');
                 }
-                
+
                 // Success - save user to localStorage
                 const userData = {
                     email: email,
                     name: user.name,
                     loginTime: new Date().toISOString()
                 };
-                
+
                 localStorage.setItem('currentUser', JSON.stringify(userData));
-                
+
                 // Redirect to app
                 window.location.href = 'index.html';
-                
+
             } catch (error) {
                 console.error('Login error:', error);
                 errorDiv.textContent = error.message || 'Invalid email or password';
                 errorDiv.classList.add('show');
-                
+
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Sign In';
             }
         }
-        
+
         // Initialize theme
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             const stylesheet = document.getElementById('theme-stylesheet');
             stylesheet.href = savedTheme === 'dark' ? 'dark-theme.css' : 'styles.css';
         }
-        
+
         // On page load
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
@@ -258,4 +372,5 @@
         });
     </script>
 </body>
+
 </html>
