@@ -821,6 +821,89 @@ function saveProjects() {
     localStorage.setItem('projects', JSON.stringify(projects));
 }
 
+/* ----- Export / Import Backup Helpers ----- */
+function exportLocalData() {
+    try {
+        const backup = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const raw = localStorage.getItem(key);
+            try {
+                backup[key] = JSON.parse(raw);
+            } catch (e) {
+                backup[key] = raw;
+            }
+        }
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const now = new Date();
+        const stamp = now.toISOString().replace(/[:.]/g, '-');
+        a.href = url;
+        a.download = `project-manager-backup-${stamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('Export created — check your downloads folder', 'success');
+    } catch (err) {
+        console.error('Export failed', err);
+        showToast('Export failed', 'error');
+    }
+}
+
+function handleImportFile(event) {
+    const file = event.target && event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        try {
+            const parsed = JSON.parse(reader.result);
+            const keys = Array.isArray(parsed) ? ['projects'] : Object.keys(parsed || {});
+            const message = `This file contains keys: ${keys.join(', ')}. Import will overwrite any existing keys with the same names. Proceed?`;
+            showDialog(message, 'Import Data', 'Import').then((confirm) => {
+                if (!confirm) return;
+                // Apply import
+                if (Array.isArray(parsed)) {
+                    // Common case: exported projects array
+                    localStorage.setItem('projects', JSON.stringify(parsed));
+                } else if (typeof parsed === 'object' && parsed !== null) {
+                    for (const k of Object.keys(parsed)) {
+                        const v = parsed[k];
+                        // store primitives as raw strings, objects/arrays as JSON
+                        if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean' || v === null) {
+                            localStorage.setItem(k, v === null ? 'null' : String(v));
+                        } else {
+                            localStorage.setItem(k, JSON.stringify(v));
+                        }
+                    }
+                } else {
+                    showToast('Unrecognized import format', 'error');
+                    return;
+                }
+
+                // Refresh in-memory data
+                loadProjects();
+                if (typeof loadHabitsData === 'function') loadHabitsData();
+                // If theme was included, apply it
+                const maybeTheme = parsed && parsed.theme;
+                if (maybeTheme && typeof maybeTheme === 'string') applyTheme(maybeTheme);
+
+                showToast('Import successful', 'success');
+            });
+        } catch (err) {
+            console.error('Import failed', err);
+            showToast('Failed to import: invalid JSON file', 'error');
+        } finally {
+            // Reset input so the same file can be re-selected later if needed
+            try { event.target.value = ''; } catch (e) { }
+        }
+    };
+    reader.readAsText(file);
+}
+
 
 function renderProjectList() {
     const list = document.getElementById('projectList');
