@@ -390,7 +390,7 @@ function renderEntityNotesList(ctx, query = '') {
     if (!modal) return;
     const entity = ctx.entity;
     const container = document.getElementById('entityNotesList');
-    const filtered = (entity.notes || []).slice().filter(n => (n.title || '').toLowerCase().includes(query.toLowerCase()) || (n.content || '').toLowerCase().includes(query.toLowerCase())).sort((a,b)=> new Date(b.updatedAt)-new Date(a.updatedAt));
+    const filtered = (entity.notes || []).slice().filter(n => (n.title || '').toLowerCase().includes(query.toLowerCase()) || (n.content || '').toLowerCase().includes(query.toLowerCase())).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     if (filtered.length === 0) {
         container.innerHTML = '<div style="padding:16px; text-align:center; color:var(--color-text-light); font-size:13px;">No notes found</div>';
         document.getElementById('entityNoteEditorPane').innerHTML = '<div style="text-align:center; color:var(--color-text-light); padding:24px;">Select a note or create a new one</div>';
@@ -404,14 +404,14 @@ function renderEntityNotesList(ctx, query = '') {
              onmouseout="if('${n.id}' !== '${currentNoteId}') this.style.background='transparent';" 
              onclick="(function(){ const modal=document.getElementById('entityNotesModal'); modal._currentNoteId='${n.id}'; selectEntityNoteGeneric('${n.id}', modal._ctx); })()">
             <div style="font-weight:600; font-size:14px; color:var(--color-text); margin-bottom:4px;">${escapeHtml(n.title)}</div>
-            <div style="font-size:11px; color:var(--color-text-light);">${new Date(n.updatedAt).toLocaleDateString('en-US', {month:'numeric', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'})}</div>
+            <div style="font-size:11px; color:var(--color-text-light);">${new Date(n.updatedAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</div>
         </div>
     `).join('');
 }
 
 function createEntityNoteGeneric(modalCtx) {
     const entity = modalCtx.entity;
-    const note = { id: Date.now().toString() + Math.random().toString(36).slice(2,8), title: 'Untitled', content: '', updatedAt: new Date().toISOString() };
+    const note = { id: Date.now().toString() + Math.random().toString(36).slice(2, 8), title: 'Untitled', content: '', updatedAt: new Date().toISOString() };
     entity.notes.unshift(note);
     saveProjects();
     renderEntityNotesList(modalCtx);
@@ -432,7 +432,7 @@ function selectEntityNoteGeneric(noteId, modalCtx) {
             <textarea id="entityNoteBody" class="editor-body" placeholder="Write your note here (supports Markdown)..." style="flex:1; width:100%; border:1px solid var(--color-border); border-radius:6px; padding:12px; font-size:14px; font-family:inherit; line-height:1.6; resize:none;">${escapeHtml(note.content)}</textarea>
             <div id="entityNotePreviewArea" class="note-preview" style="display:none; margin-top:12px; padding:16px; border:1px solid var(--color-border); border-radius:6px; background:var(--color-bg-light); max-height:400px; overflow-y:auto;"></div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid var(--color-border);">
-                <div style="font-size:12px; color:var(--color-text-light);">Last edited: ${new Date(note.updatedAt).toLocaleDateString('en-US', {month:'numeric', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'})}</div>
+                <div style="font-size:12px; color:var(--color-text-light);">Last edited: ${new Date(note.updatedAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</div>
                 <div style="display:flex; gap:8px;">
                     <button class="btn-small danger" id="entityNoteDeleteBtn" style="background:var(--color-error-light); color:var(--color-error); border:1px solid var(--color-error); padding:6px 14px; font-size:13px;">Delete</button>
                     <button class="btn-small" id="entityNoteSaveBtn" style="background:var(--color-bg-light); border:1px solid var(--color-border); padding:6px 14px; font-size:13px;">Save</button>
@@ -999,7 +999,7 @@ function renderProjectContent() {
     let daysLeftHTML = '';
     if (project.expectedEndDate) {
         const endDate = new Date(project.expectedEndDate);
-            const today = new Date();
+        const today = new Date();
         today.setHours(0, 0, 0, 0);
         endDate.setHours(0, 0, 0, 0);
         const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
@@ -1772,7 +1772,7 @@ async function openFloatingSession(taskId, sessionId) {
     const el = document.createElement('div');
     el.className = 'floating-session active';
     el.id = `floating-${sessionId}`;
-    
+
     // Adjust styles for PiP mode
     if (supportsPiP && pipWindow) {
         el.style.position = 'relative';
@@ -1797,11 +1797,11 @@ async function openFloatingSession(taskId, sessionId) {
         </div>
         <div class="floating-body">
             <div style="display:flex;align-items:center;gap:10px;">
-                <div style="flex:1">
+                <div class="floating-started-only" style="flex:1">
                     <div style="font-size:12px; color:var(--color-text-light);">Started</div>
                     <div style="font-weight:700;">${new Date(session.startedAt).toLocaleString()}</div>
                 </div>
-                <div style="text-align:right;min-width:120px;">
+                <div class="floating-duration-only" style="text-align:right;min-width:120px;">
                     <div style="font-size:12px; color:var(--color-text-light);">Duration</div>
                     <div id="floating-duration-${sessionId}" style="font-weight:700; color:var(--color-primary);">--</div>
                 </div>
@@ -1820,6 +1820,24 @@ async function openFloatingSession(taskId, sessionId) {
         // enable dragging only for in-page mode
         makeFloatingDraggable(el);
     }
+
+    // 🔽 Auto switch to "min mode" when size is small
+    const MIN_HEIGHT = 90; // adjust if needed
+
+    const resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            const { height } = entry.contentRect;
+
+            if (height < MIN_HEIGHT) {
+                el.classList.add('minimized');
+            } else {
+                el.classList.remove('minimized');
+            }
+        }
+    });
+
+    resizeObserver.observe(el);
+
 
     // Wire up event handlers (works in both PiP and in-page mode)
     const closeBtn = el.querySelector(`#pip-close-btn-${sessionId}`);
@@ -1878,13 +1896,21 @@ async function openFloatingSession(taskId, sessionId) {
     updateFn();
     const interval = setInterval(updateFn, 1000);
 
-    activeFloating = { taskId, sessionId, el, interval, pipWindow };
+    activeFloating = {
+        taskId,
+        sessionId,
+        el,
+        interval,
+        pipWindow,
+        resizeObserver
+    };
+
 }
 
 function closeFloatingSession() {
     if (!activeFloating) return;
     if (activeFloating.interval) clearInterval(activeFloating.interval);
-    
+
     // Close PiP window if open
     if (activeFloating.pipWindow) {
         try {
@@ -1893,12 +1919,16 @@ function closeFloatingSession() {
             console.warn('Failed to close PiP window:', e);
         }
     }
-    
+    // Disconnect ResizeObserver
+    if (activeFloating?.resizeObserver) {
+        activeFloating.resizeObserver.disconnect();
+    }
+
     // Remove element from DOM (in-page mode)
     if (activeFloating.el && activeFloating.el.parentNode) {
         activeFloating.el.parentNode.removeChild(activeFloating.el);
     }
-    
+
     activeFloating = null;
 }
 
@@ -2042,7 +2072,7 @@ async function loadHabitsData() {
     if (savedHabits) habits = JSON.parse(savedHabits);
     if (savedCompletions) habitCompletions = JSON.parse(savedCompletions);
     if (savedSpendings) habitSpendings = JSON.parse(savedSpendings);
-    
+
     habitsLoaded = true;
 }
 
@@ -2072,12 +2102,12 @@ async function addSpending(item, amount, tag = 'Other') {
 
     // Save to localStorage
     if (!habitSpendings[key]) habitSpendings[key] = [];
-    habitSpendings[key].push({ 
-        id: Date.now().toString(), 
-        item: item.trim(), 
-        amount: parsed, 
-        tag: tag || 'Other', 
-        createdAt: new Date().toISOString() 
+    habitSpendings[key].push({
+        id: Date.now().toString(),
+        item: item.trim(),
+        amount: parsed,
+        tag: tag || 'Other',
+        createdAt: new Date().toISOString()
     });
 
     saveHabits();

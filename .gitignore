@@ -3,6 +3,7 @@ ProjectManagement.html
 gemini.html
 AuraDashboard.html
 landingPage-PRD.md
+landing-page.html
 # Ignore all markdown files by default
 *.md
 # But keep README files (allow them to remain tracked)
