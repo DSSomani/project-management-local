@@ -13,64 +13,63 @@
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <div class="sidebar">
-            <div>
-                <div class="view-tabs">
-                    <button class="view-tab active" id="activeTab" onclick="switchView('active')">
-                        <span
-                            style="display:inline-block; width:10px; height:10px; background:#28c76f; border-radius:50%; animation:pulse 1.5s infinite;"></span>
-                        Active
-                    </button>
-                    <button class="view-tab" id="archivedTab" onclick="switchView('archived')">
-                        <span
-                            style=" display:inline-block; width:10px; height:10px; background:#9ca3af; /* Grey */ border-radius:50%;">
-                        </span>Archived
-                    </button>
-                    <button class="view-tab" id="habitsTab" onclick="switchView('habits')">
-                        <span
-                            style=" display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%;"></span>
-                        Habits
-                    </button>
-                </div>
-                <div id="projectsSection">
-                    <ul class="project-list" id="projectList"></ul>
-                    <button class="btn-new-project" onclick="openNewProjectModal()">+ New Project</button>
-                </div>
-                <div id="habitsSidebar" class="habits-sidebar" style="display: none;">
-                    <div class="habits-date-nav">
-                        <button class="btn-nav" onclick="changeHabitDate(-1)">◀</button>
-                        <span id="habitDateDisplay">Today</span>
-                        <button class="btn-nav" onclick="changeHabitDate(1)">▶</button>
+        <div class="sidebar" id="sidebar">
+            <!-- collapse button -->
+            <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()"title="Collapse sidebar"></button>
+            <div class="sidebar-content">
+                <div>
+                    <div class="view-tabs">
+                        <button class="view-tab active" id="activeTab" onclick="switchView('active')">
+                            <span
+                                style="display:inline-block; width:10px; height:10px; background:#28c76f; border-radius:50%; animation:pulse 1.5s infinite;"></span>
+                            Active
+                        </button>
+                        <button class="view-tab" id="archivedTab" onclick="switchView('archived')">
+                            <span
+                                style=" display:inline-block; width:10px; height:10px; background:#9ca3af; /* Grey */ border-radius:50%;">
+                            </span>Archived
+                        </button>
+                        <button class="view-tab" id="habitsTab" onclick="switchView('habits')">
+                            <span
+                                style=" display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%;"></span>
+                            Habits
+                        </button>
                     </div>
-                    <div class="habits-streak-info">
-                        <div class="streak-item">
-                            <span class="streak-icon"><i class="fa-solid fa-fire"></i></span>
+                    <div id="projectsSection">
+                        <ul class="project-list" id="projectList"></ul>
+                        <button class="btn-new-project" onclick="openNewProjectModal()">+ New Project</button>
+                    </div>
+                    <div id="habitsSidebar" class="habits-sidebar" style="display: none;">
+                        <div class="habits-date-nav">
+                            <button class="btn-nav" onclick="changeHabitDate(-1)">◀</button>
+                            <span id="habitDateDisplay">Today</span>
+                            <button class="btn-nav" onclick="changeHabitDate(1)">▶</button>
+                        </div>
+                        <div class="habits-streak-info">
+                            <div class="streak-item">
+                                <span class="streak-icon"><i class="fa-solid fa-fire"></i></span>
 
-                            <span id="currentStreak">0</span>
-                            <span class="streak-label">Current</span>
-                        </div>
-                        <div class="streak-item">
-                            <span class="streak-icon">⭐</span>
-                            <span id="bestStreak">0</span>
-                            <span class="streak-label">Best</span>
+                                <span id="currentStreak">0</span>
+                                <span class="streak-label">Current</span>
+                            </div>
+                            <div class="streak-item">
+                                <span class="streak-icon">⭐</span>
+                                <span id="bestStreak">0</span>
+                                <span class="streak-label">Best</span>
+                            </div>
                         </div>
                     </div>
-                    <!-- Export / Import (backup) -->
-                    <!-- <div class="sidebar-footer">
-                    <input type="file" id="importFileInput" accept=".json,application/json" style="display:none" onchange="handleImportFile(event)">
+                </div>
+                <!-- Export / Import (backup) -->
+                <div class="sidebar-footer">
+                    <input type="file" id="importFileInput" accept=".json,application/json" style="display:none"
+                        onchange="handleImportFile(event)">
                     <button class="btn-export" onclick="exportLocalData()">Export</button>
                     <button class="btn-import" onclick="document.getElementById('importFileInput').click()">Import</button>
-                </div> -->
                 </div>
-            </div> 
-            <!-- Export / Import (backup) -->
-            <div class="sidebar-footer">
-                <input type="file" id="importFileInput" accept=".json,application/json" style="display:none"
-                    onchange="handleImportFile(event)">
-                <button class="btn-export" onclick="exportLocalData()">Export</button>
-                <button class="btn-import" onclick="document.getElementById('importFileInput').click()">Import</button>
             </div>
         </div>
+        <button class="sidebar-expand-btn" onclick="toggleSidebarCollapse()" title="Expand sidebar"></button>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -78,17 +77,33 @@
                 <div style="display: flex; justify-content: space-between; gap: 8px; align-items: center;">
                     <h1 id="projectTitle">Select a Project</h1>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()"
-                            title="Toggle Dark/Light Mode">
-                            <span
-                                style="display:inline-flex; width:12px; height:12px; border-radius:50%; background:linear-gradient(90deg, #817d6f 50%, #1e293b 50%);"></span>
-                        </button>
-                        <button class="btn-small" onclick="logout()" title="Sign Out"
-                            style="padding: 8px 12px; font-size: 13px;">
-                            <span
-                                style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:2px;"></span>
-                            Logout
-                        </button>
+                        <!-- Kebab Menu -->
+                        <div class="kebab-menu-container">
+                            <button class="kebab-menu-btn" onclick="toggleKebabMenu(event)" title="More options">
+                                <span class="kebab-icon">⋮</span>
+                            </button>
+                            <div class="kebab-menu-dropdown" id="kebabMenuDropdown">
+                                <!-- Project-specific options (shown when project is selected) -->
+                                <div class="kebab-menu-section" id="projectMenuOptions">
+                                    <button class="kebab-menu-item"
+                                        onclick="switchProjectSubview('tasks'); closeKebabMenu()">Tasks</button>
+                                    <button class="kebab-menu-item"
+                                        onclick="switchProjectSubview('notes'); closeKebabMenu()">Notes</button>
+                                    <button class="kebab-menu-item"
+                                        onclick="openEditProjectModal(); closeKebabMenu()">Edit</button>
+                                    <button class="kebab-menu-item" onclick="archiveProject(); closeKebabMenu()"><span
+                                            id="archiveText">Archive</span></button>
+                                    <button class="kebab-menu-item danger"
+                                        onclick="deleteProject(); closeKebabMenu()">Delete</button>
+                                    <div class="kebab-menu-divider"></div>
+                                </div>
+                                <!-- Always visible options -->
+                                <button class="kebab-menu-item" onclick="toggleTheme(); closeKebabMenu()">Toggle
+                                    Theme</button>
+                                <button class="kebab-menu-item danger" onclick="logout(); closeKebabMenu()">Sign
+                                    Out</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

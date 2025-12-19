@@ -25,15 +25,86 @@ function toggleTheme() {
 function applyTheme(theme) {
     const stylesheet = document.getElementById('theme-stylesheet');
     const themeIcon = document.getElementById('themeIcon');
+    const kebabThemeIcon = document.getElementById('kebabThemeIcon');
 
     if (theme === 'dark') {
         stylesheet.href = 'dark-theme.css';
         if (themeIcon) themeIcon.textContent = '☀️';
+        if (kebabThemeIcon) kebabThemeIcon.textContent = '☀️';
     } else {
         stylesheet.href = 'styles.css'; // 
         if (themeIcon) themeIcon.textContent = '🌙';
+        if (kebabThemeIcon) kebabThemeIcon.textContent = '🌙';
     }
 }
+function toggleSidebarCollapse() {
+  const sidebar = document.getElementById('sidebar');
+
+  if (!sidebar) {
+    console.error('Sidebar element not found');
+    return;
+  }
+
+  sidebar.classList.toggle('collapsed');
+
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  localStorage.setItem('sidebarCollapsed', isCollapsed);
+}
+
+
+// Restore state on load
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+  if (collapsed) {
+    sidebar.classList.add('collapsed');
+  }
+});
+
+// Kebab Menu Functions
+function toggleKebabMenu(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    dropdown.classList.toggle('active');
+    
+    // Update menu items based on current project selection
+    updateKebabMenuItems();
+}
+
+function closeKebabMenu() {
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    dropdown.classList.remove('active');
+}
+
+function updateKebabMenuItems() {
+    const projectMenuOptions = document.getElementById('projectMenuOptions');
+    const archiveText = document.getElementById('archiveText');
+    
+    if (currentProjectId) {
+        // Show project-specific options when a project is selected
+        projectMenuOptions.classList.add('show');
+        
+        // Update archive/unarchive text based on current view
+        const project = projects.find(p => p.id === currentProjectId);
+        if (project) {
+            archiveText.textContent = project.archived ? 'Unarchive' : 'Archive';
+        }
+    } else {
+        // Hide project-specific options when no project is selected
+        projectMenuOptions.classList.remove('show');
+    }
+}
+
+// Close kebab menu when clicking outside
+document.addEventListener('click', function(event) {
+    const kebabContainer = document.querySelector('.kebab-menu-container');
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    
+    if (dropdown && kebabContainer && !kebabContainer.contains(event.target)) {
+        dropdown.classList.remove('active');
+    }
+});
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', initTheme);
@@ -710,6 +781,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadProjects();
     await loadHabitsData(); // Load habits from localStorage
     setupSessionCalculation();
+    updateKebabMenuItems(); // Initialize kebab menu state
 });
 
 // Logout function
@@ -953,6 +1025,7 @@ function switchView(view) {
     `;
     // Render chart after we've inserted the HTML (if a financial canvas exists)
     setTimeout(() => renderSpendingChart(), 0);
+    updateKebabMenuItems(); // Update kebab menu when view is switched
 }
 
 function selectProject(projectId) {
@@ -960,6 +1033,7 @@ function selectProject(projectId) {
     expandedTasks.clear(); // Reset expanded tasks when switching projects
     renderProjectList();
     renderProjectContent();
+    updateKebabMenuItems(); // Update kebab menu based on project selection
 }
 
 function toggleTaskSessions(taskId) {
@@ -1024,58 +1098,7 @@ function renderProjectContent() {
     <span class="project-title">${project.name}</span>
     ${daysLeftHTML}
   </div>
-
-  <div class="project-header-right">
-    <div class="project-subtabs">
-      <!-- Tasks tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'tasks' ? 'btn-subtab-active' : ''}"
-        id="subtabTasks"
-        onclick="switchProjectSubview('tasks')"
-      >
-        <span class="icon-dot icon-dot-primary"></span>
-        <span>Tasks</span>
-      </button>
-
-      <!-- Notes tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'notes' ? 'btn-subtab-active' : ''}"
-        id="subtabNotes"
-        onclick="switchProjectSubview('notes')"
-      >
-        <span class="icon-dot icon-dot-yellow"></span>
-        <span>Notes</span>
-      </button>
-    </div>
-
-    <!-- Edit -->
-    <button
-      class="btn-action btn-action-edit"
-      onclick="openEditProjectModal()"
-    >
-      <span class="icon-dash">—</span>
-      <span>Edit</span>
-    </button>
-
-    <!-- Archive / Unarchive -->
-    <button
-      class="btn-action btn-action-archive"
-      onclick="toggleArchiveProject()"
-    >
-      <span class="icon-dot ${project.archived ? 'icon-dot-green' : 'icon-dot-gray'}"></span>
-      <span>${project.archived ? 'Unarchive' : 'Archive'}</span>
-    </button>
-
-    <!-- Delete -->
-    <button
-      class="btn-action btn-action-delete"
-      onclick="deleteProject()"
-    >
-      <span class="icon-dot icon-dot-red"></span>
-      <span>Delete</span>
-    </button>
-  </div>
-</div>`;
+`;
 
     // If the selected project subview is Notes, render notes and skip the tasks renderer
     if (currentProjectSubView === 'notes') {
@@ -1279,6 +1302,7 @@ function renderProjectContent() {
     }
 
     document.getElementById('content').innerHTML = html;
+    updateKebabMenuItems(); // Update kebab menu when content is rendered
 }
 
 function openNewProjectModal() {
@@ -2624,6 +2648,7 @@ switchView = function (view) {
             </div>
         `;
     }
+    updateKebabMenuItems(); // Update kebab menu when view is switched
 };
 
 // Initialize habits on load
