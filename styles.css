@@ -132,9 +132,7 @@ input[type="reset"],
     position: absolute;
   display: block;
 }
-.sidebarGroup {
-    
-}
+
 .sidebar-content {
     display: flex;
     flex-direction: column;
@@ -1832,10 +1830,6 @@ input[type="reset"],
     height: 1px;
     background: var(--color-border);
     margin: 8px 0;
-}
-
-.kebab-menu-section {
-    /* Container for project-specific menu items */
 }
 
 /* Hide project menu options by default */
