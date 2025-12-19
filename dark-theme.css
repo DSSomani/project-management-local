@@ -251,7 +251,27 @@ input[type="reset"],
 .header h1 {
     font-size: 28px;
     color: var(--color-text-dark);
-    width:86%;
+    width: auto;
+    /* allow project header layout to use full space */
+}
+
+/* Project title container (overrides h1 width when rendering project header) */
+#projectTitle {
+    display: inline-block;
+    max-width: 100%;
+}
+
+#projectTitle .project-header {
+    width: 100%;
+}
+
+/* Ensure project kebab menu appears above other elements */
+.project-header .kebab-wrapper {
+    z-index: 10001;
+}
+
+.project-header .kebab-wrapper .kebab-menu {
+    z-index: 10002;
 }
 
 /* Theme Toggle Button */
@@ -305,7 +325,21 @@ input[type="reset"],
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+}
+
+/* Ensure project kebab is always visible and aligned */
+.project-header .kebab-wrapper {
+    display: inline-block !important;
+    margin-left: 8px;
+}
+
+.kebab-btn {
+    color: var(--color-text-dark);
+    background: var(--color-bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 6px 10px;
 }
 
 /* Project Subtabs */
@@ -1846,6 +1880,123 @@ input[type="reset"],
     .habits-summary {
         flex-direction: column;
     }
+}
+
+/* ===== Kebab menu styles ===== */
+.kebab-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.kebab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-border);
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--color-text-dark);
+    line-height: 1;
+}
+
+.kebab-btn:hover {
+    background: var(--color-border);
+}
+
+.kebab-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12);
+    border-radius: 8px;
+}
+
+.kebab-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    display: none;
+    min-width: 160px;
+    background: var(--color-bg-white);
+    box-shadow: var(--shadow-md);
+    border-radius: 8px;
+    padding: 6px;
+    z-index: 9999;
+    /* ensure it's above overlays */
+    will-change: transform, opacity, left, top;
+}
+
+.kebab-menu .open {
+    display: block;
+}
+
+.kebab-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--color-text-dark);
+}
+
+.kebab-menu button:hover {
+    background: var(--color-bg-border);
+}
+
+.kebab-menu button.danger {
+    color: var(--color-error);
+    font-weight: 600;
+}
+
+/* Hide big inline action buttons on small screens; use kebab there */
+@media (max-width: 768px) {
+    .project-header-right .btn-action {
+        display: none;
+    }
+
+    .project-header-right .project-subtabs {
+        display: none;
+    }
+
+    /* Hide subtabs on mobile, use kebab */
+    .kebab-wrapper {
+        position: relative;
+        margin-left: 6px;
+        display: inline-block !important;
+    }
+
+    /* Hide header inline buttons on mobile, show global kebab */
+    .header-action-btn {
+        display: none !important;
+    }
+
+    .global-kebab {
+        display: inline-block;
+    }
+}
+
+/* Desktop: show global kebab (use kebab menu on desktop too) and hide inline header buttons */
+@media (min-width: 769px) {
+    .global-kebab {
+        display: inline-block;
+    }
+
+    /* prefer kebab on desktop — hide inline header buttons */
+    .header-action-btn {
+        display: none !important;
+    }
+}
+
+/* Hide global kebab when project is selected (project-header exists in DOM) */
+.project-header~* .global-kebab,
+body:has(.project-header) .global-kebab {
+    display: none !important;
 }
 
 /* Animation */

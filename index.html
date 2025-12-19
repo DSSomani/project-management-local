@@ -11,9 +11,12 @@
 </head>
 
 <body>
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+    
     <div class="container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div>
                 <div class="view-tabs">
                     <button class="view-tab active" id="activeTab" onclick="switchView('active')">
@@ -76,14 +79,26 @@
         <div class="main-content">
             <div class="header">
                 <div style="display: flex; justify-content: space-between; gap: 8px; align-items: center;">
+                    <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open sidebar" aria-expanded="false" aria-controls="sidebar" onclick="toggleSidebar()">
+                        <span class="hamburger-icon">☰</span>
+                    </button>
                     <h1 id="projectTitle">Select a Project</h1>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()"
+                        <!-- Global kebab menu for mobile -->
+                        <div class="kebab-wrapper global-kebab">
+                            <button id="globalKebabBtn" class="kebab-btn" aria-label="Menu" aria-expanded="false" onclick="toggleGlobalKebab()">⋮</button>
+                            <div class="kebab-menu" id="globalKebabMenu" role="menu" aria-hidden="true">
+                                <button role="menuitem" onclick="toggleTheme(); toggleGlobalKebab(false)">Toggle Theme</button>
+                                <button role="menuitem" class="danger" onclick="logout()">Sign Out</button>
+                            </div>
+                        </div>
+                        <!-- Desktop: show inline buttons -->
+                        <button class="theme-toggle-btn header-action-btn" id="themeToggle" onclick="toggleTheme()"
                             title="Toggle Dark/Light Mode">
                             <span
                                 style="display:inline-flex; width:12px; height:12px; border-radius:50%; background:linear-gradient(90deg, #817d6f 50%, #1e293b 50%);"></span>
                         </button>
-                        <button class="btn-small" onclick="logout()" title="Sign Out"
+                        <button class="btn-small header-action-btn" onclick="logout()" title="Sign Out"
                             style="padding: 8px 12px; font-size: 13px;">
                             <span
                                 style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:2px;"></span>

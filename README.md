@@ -37,6 +37,16 @@ python3 -m http.server 8000
 
 ## Key Features
 
+### Mobile-Responsive Layout 📱
+
+This app supports a **mobile-first responsive layout** that adapts to phones, tablets, and desktops:
+- On mobile devices, the sidebar collapses into a hamburger menu for better screen real estate
+- Touch-friendly buttons and inputs (minimum 44×44px touch targets)
+- Full-screen modals on small screens, centered on larger screens
+- No horizontal scrolling at any viewport size
+
+For detailed implementation information, see [RESPONSIVE.md](RESPONSIVE.md).
+
 ### Floating session controls fix
 
 - If a floating session window is open, the Close (✕) and Open buttons should now respond correctly even if you click within the header area. If you notice the controls not responding, ensure the page is focused and try again.

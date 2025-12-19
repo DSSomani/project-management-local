@@ -220,8 +220,20 @@ input[type="reset"],
 .header h1 {
     font-size: 28px;
     color: var(--color-text-dark);
-    width: 86%;
+    width: auto; /* allow project header layout to use full space */
 }
+
+/* Project title container (overrides h1 width when rendering project header) */
+#projectTitle {
+    display: inline-flex;
+    justify-content: space-between;
+  max-width: 100%;
+}
+#projectTitle .project-header { display: flex;justify-content: space-between; width: 100%; }
+
+/* Ensure project kebab menu appears above other elements */
+.project-header .kebab-wrapper { z-index: 10001; }
+.project-header .kebab-wrapper .kebab-menu { z-index: 10002; }
 
 /* Theme Toggle Button */
 .theme-toggle-btn {
@@ -273,15 +285,26 @@ input[type="reset"],
 .project-header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+/* Ensure project kebab is always visible and aligned */
+.project-header .kebab-wrapper {
+    display: inline-block !important;
+    margin-left: 8px;
+}
+.kebab-btn {
+    color: var(--color-text-dark);
+    background: var(--color-bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 6px 10px;
 }
 
 /* Small project subtab buttons (Tasks / Notes) - pill toggle style */
 .project-subtabs {
     display: inline-flex;
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
     overflow: hidden;
     background: var(--color-bg-white);
 }
@@ -1598,10 +1621,12 @@ input[type="reset"],
         max-width: 320px;
         border-right: none;
         border-bottom: 1px solid var(--color-border);
-        max-height: 200px;
+        height: 100vh; /* full viewport height */
         display: flex;
+        flex-direction: column;
         gap: var(--space-16);
-        align-items: start;
+        align-items: stretch;
+        overflow-y: auto; /* allow scrolling when content exceeds viewport */
     }
 
     .session-row {
@@ -1618,4 +1643,210 @@ input[type="reset"],
   0% { box-shadow:0 0 0 0 rgba(40,199,111,0.6); }
   70% { box-shadow:0 0 0 10px rgba(40,199,111,0); }
   100% { box-shadow:0 0 0 0 rgba(40,199,111,0); }
+}
+/* ===== MOBILE-FIRST RESPONSIVE STYLES ===== */
+/* Mobile-first base */
+html, body { 
+    width: 100%; 
+    overflow-x: hidden; 
+}
+
+/* Hamburger button */
+.hamburger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--color-text-dark);
+}
+.hamburger-btn:focus { 
+    outline: 2px solid var(--color-primary); 
+    border-radius: 4px; 
+}
+.hamburger-btn:hover {
+    background: var(--color-bg-border);
+    border-radius: 4px;
+}
+
+/* ===== Kebab menu styles ===== */
+.kebab-wrapper { position: relative; display: inline-block; margin-left: 8px; }
+.kebab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-border);
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--color-text-dark);
+  line-height: 1;
+}
+.kebab-btn:hover { background: var(--color-border); }
+.kebab-btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(33,127,206,0.14); border-radius: 8px; }
+
+.kebab-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;     /* aligns to button, not page */
+  margin-top: 6px;
+  display: none;
+  min-width: 160px;
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 9999; /* ensure it's above overlays */
+  will-change: transform, opacity, left, top;
+}
+.kebab-menu.open { display: block; }
+.kebab-menu button { display: block; width: 100%; text-align: left; padding: 10px 12px; background: transparent; border: none; border-radius: 6px; cursor: pointer; }
+.kebab-menu button:hover { background: var(--color-bg-border); }
+.kebab-menu button.danger { color: var(--color-error); font-weight: 600; }
+
+/* Hide big inline action buttons on small screens; use kebab there */
+@media (max-width: 768px) {
+  .project-header-right .btn-action { display: none; }
+  .project-header-right .project-subtabs { display: none; } /* Hide subtabs on mobile, use kebab */
+  .kebab-wrapper {position: relative; margin-left: 6px; display: inline-block !important; }
+  /* Hide header inline buttons on mobile, show global kebab */
+  .header-action-btn { display: none !important; }
+  .global-kebab { display: inline-block; }
+  .project-kebab { display: inline-block; }
+}
+
+/* Desktop: show global kebab (use kebab menu on desktop too) and hide inline header buttons */
+@media (min-width: 769px) {
+  .global-kebab { display: inline-block; }
+  .project-kebab { display: inline-block; }
+
+  /* prefer kebab on desktop — hide inline header buttons */
+  .header-action-btn { display: none !important; }
+}
+
+/* Hide global kebab when project is selected (project-header exists in DOM) */
+.project-header ~ * .global-kebab,
+body:has(.project-header) .global-kebab {
+  display: none !important;
+}
+
+
+/* Full-width form elements on small screens */
+.form-input, .form-select, .form-textarea, .btn-primary, .btn-secondary, .btn-new-project {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Sidebar overlay */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1050;
+    display: none;
+}
+
+/* Mobile: Hide sidebar by default, show with toggle */
+@media (max-width: 768px) {
+.header h1 {
+    font-size: 14px;
+    color: var(--color-text-dark);
+    width: 70%;
+}
+.project-title{
+    max-width: 200px;
+}
+  .container { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+      height: 100vh;
+  }
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100vh;
+    transition: left .25s ease;
+    z-index: 1100;
+    background: var(--color-bg-white);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    overflow-y: auto;
+  }
+  
+  body.sidebar-open .sidebar { 
+      left: 0; 
+  }
+  
+  body.sidebar-open .sidebar-overlay { 
+      display: block; 
+  }
+  
+  .main-content { 
+      padding: 16px; 
+      margin-left: 0;
+      width: 100%;
+  }
+  
+  /* Modals full screen on mobile */
+  .modal .modal-content {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    margin: 0;
+    box-sizing: border-box;
+    max-width: 100vw;
+  }
+  
+  /* Make header wrap better on mobile */
+  .header > div {
+      flex-wrap: wrap;
+  }
+}
+
+/* Tablet and up: show sidebar inline */
+@media (min-width: 769px) {
+  .container { 
+      flex-direction: row; 
+  }
+  
+  .sidebar { 
+      position: relative; 
+      left: 0; 
+      width: 320px;
+      max-width: 320px;
+  }
+  
+  .main-content { 
+      flex: 1; 
+      padding: 20px; 
+  }
+  
+  .hamburger-btn { 
+      display: none; 
+  }
+  
+  .sidebar-overlay {
+      display: none !important;
+  }
+}
+
+/* Touch targets - ensure minimum 44x44px for touch */
+button, .btn-small, .btn-primary, .btn-secondary, .view-tab { 
+    min-height: 44px; 
+    padding: 10px 14px; 
+}
+
+/* Prevent horizontal overflow */
+* { 
+    box-sizing: border-box; 
 }

@@ -708,6 +708,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     currentUser = JSON.parse(userDataStr);
 
     await loadProjects();
+    // Ensure kebab visibility is updated after projects load
+    if (typeof updateKebabVisibility === 'function') updateKebabVisibility();
     await loadHabitsData(); // Load habits from localStorage
     setupSessionCalculation();
 });
@@ -960,6 +962,8 @@ function selectProject(projectId) {
     expandedTasks.clear(); // Reset expanded tasks when switching projects
     renderProjectList();
     renderProjectContent();
+    // Reflect kebab visibility change
+    if (typeof updateKebabVisibility === 'function') updateKebabVisibility();
 }
 
 function toggleTaskSessions(taskId) {
@@ -1020,62 +1024,28 @@ function renderProjectContent() {
 
     document.getElementById('projectTitle').innerHTML = `
         <div class="project-header">
-  <div class="project-header-left">
-    <span class="project-title">${project.name}</span>
-    ${daysLeftHTML}
-  </div>
-
-  <div class="project-header-right">
-    <div class="project-subtabs">
-      <!-- Tasks tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'tasks' ? 'btn-subtab-active' : ''}"
-        id="subtabTasks"
-        onclick="switchProjectSubview('tasks')"
-      >
-        <span class="icon-dot icon-dot-primary"></span>
-        <span>Tasks</span>
-      </button>
-
-      <!-- Notes tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'notes' ? 'btn-subtab-active' : ''}"
-        id="subtabNotes"
-        onclick="switchProjectSubview('notes')"
-      >
-        <span class="icon-dot icon-dot-yellow"></span>
-        <span>Notes</span>
-      </button>
-    </div>
-
-    <!-- Edit -->
-    <button
-      class="btn-action btn-action-edit"
-      onclick="openEditProjectModal()"
-    >
-      <span class="icon-dash">—</span>
-      <span>Edit</span>
-    </button>
-
-    <!-- Archive / Unarchive -->
-    <button
-      class="btn-action btn-action-archive"
-      onclick="toggleArchiveProject()"
-    >
-      <span class="icon-dot ${project.archived ? 'icon-dot-green' : 'icon-dot-gray'}"></span>
-      <span>${project.archived ? 'Unarchive' : 'Archive'}</span>
-    </button>
-
-    <!-- Delete -->
-    <button
-      class="btn-action btn-action-delete"
-      onclick="deleteProject()"
-    >
-      <span class="icon-dot icon-dot-red"></span>
-      <span>Delete</span>
-    </button>
-  </div>
-</div>`;
+            <div class="project-header-left">
+                <span class="project-title">${project.name}</span>
+                ${daysLeftHTML}
+            </div>
+            <div class="project-header-right">
+                <div class="project-subtabs">
+                <!-- Kebab menu (grouped actions) -->
+                <div class="kebab-wrapper project-kebab">
+                <button id="kebabBtn" class="kebab-btn" aria-label="Project menu" aria-expanded="false" onclick="toggleKebabMenu()">⋮</button>
+                <div class="kebab-menu" id="kebabMenu" role="menu" aria-hidden="true">
+                    <button role="menuitem" onclick="switchProjectSubview('tasks'); toggleKebabMenu(false)">Tasks</button>
+                    <button role="menuitem" onclick="switchProjectSubview('notes'); toggleKebabMenu(false)">Notes</button>
+                    <button role="menuitem" onclick="openEditProjectModal(); toggleKebabMenu(false)">Edit</button>
+                    <button role="menuitem" onclick="toggleArchiveProject(); toggleKebabMenu(false)">${project.archived ? 'Unarchive' : 'Archive'}</button>
+                    <button role="menuitem" class="danger" onclick="deleteProject(); toggleKebabMenu(false)">Delete</button>
+                    <hr style="border:none; border-top:1px solid var(--color-border); margin:6px 0;">
+                    <button role="menuitem" onclick="toggleTheme(); toggleKebabMenu(false)">Toggle Theme</button>
+                    <button role="menuitem" class="danger" onclick="logout()">Sign Out</button>
+                </div>
+                </div>
+            </div>
+        </div>`;
 
     // If the selected project subview is Notes, render notes and skip the tasks renderer
     if (currentProjectSubView === 'notes') {
@@ -2039,6 +2009,8 @@ function deleteProject() {
                 </div>
             </div>
         `;
+        // Update kebab visibility since there's no selected project anymore
+        if (typeof updateKebabVisibility === 'function') updateKebabVisibility();
     });
 }
 
@@ -2631,3 +2603,176 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize streaks display
     updateStreakDisplay();
 });
+// ===== MOBILE RESPONSIVE: Sidebar toggle =====
+function toggleSidebar(expand) {
+  const body = document.body;
+  const btn = document.getElementById('hamburgerBtn');
+  const shouldOpen = typeof expand === 'boolean' ? expand : !body.classList.contains('sidebar-open');
+
+  if (shouldOpen) {
+    body.classList.add('sidebar-open');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  } else {
+    body.classList.remove('sidebar-open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+// Close sidebar on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+    toggleSidebar(false);
+  }
+});
+
+// Close sidebar on overlay click
+document.addEventListener('click', (e) => {
+  if (document.body.classList.contains('sidebar-open')) {
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (overlay && (e.target === overlay)) {
+        toggleSidebar(false);
+    }
+  }
+});
+
+// ===== Kebab menu toggle & close behavior =====
+function toggleKebabMenu(open) {
+  const btn = document.getElementById('kebabBtn');
+  const menu = document.getElementById('kebabMenu');
+  if (!menu || !btn) return;
+
+  const shouldOpen = typeof open === 'boolean' ? open : !menu.classList.contains('open');
+  if (shouldOpen) {
+    menu.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    menu.setAttribute('aria-hidden', 'false');
+
+    // Ensure the menu is positioned so it isn't clipped by overflow ancestors
+    try {
+      const rect = btn.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      const maxMenuWidth = Math.max(160, Math.min(360, Math.floor(window.innerWidth * 0.4)));
+      menu.style.minWidth = maxMenuWidth + 'px';
+      // Force a reflow so menuRect calculations are accurate
+      const menuRect = menu.getBoundingClientRect();
+
+      // Align right edges if space allows
+      let left = rect.right - (menuRect.width || maxMenuWidth);
+      if (left < 8) left = 8;
+      if (left + (menuRect.width || maxMenuWidth) > window.innerWidth - 8) left = window.innerWidth - (menuRect.width || maxMenuWidth) - 8;
+      let top = rect.bottom + 8;
+      if (top + (menuRect.height || 120) > window.innerHeight - 8) {
+        top = rect.top - (menuRect.height || 120) - 8; // place above if no space below
+        if (top < 8) top = 8;
+      }
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+    } catch (e) {
+      // positioning failed, fall back to CSS absolute behavior
+      menu.style.position = '';
+      menu.style.left = '';
+      menu.style.top = '';
+      menu.style.minWidth = '';
+    }
+  } else {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-hidden', 'true');
+    // reset any inline positioning
+    menu.style.position = '';
+    menu.style.left = '';
+    menu.style.top = '';
+    menu.style.minWidth = '';
+  }
+}
+
+// Close kebab on outside click
+document.addEventListener('click', (e) => {
+  // Project kebab menu
+  const menu = document.getElementById('kebabMenu');
+  const btn = document.getElementById('kebabBtn');
+  if (menu && menu.classList.contains('open')) {
+    if (!(menu.contains(e.target) || (btn && btn.contains(e.target)))) {
+      toggleKebabMenu(false);
+    }
+  }
+  // Global kebab menu
+  const globalMenu = document.getElementById('globalKebabMenu');
+  const globalBtn = document.getElementById('globalKebabBtn');
+  if (globalMenu && globalMenu.classList.contains('open')) {
+    if (!(globalMenu.contains(e.target) || (globalBtn && globalBtn.contains(e.target)))) {
+      toggleGlobalKebab(false);
+    }
+  }
+});
+
+// Close kebab on ESC key (also handles sidebar)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    // project kebab menu
+    const menu = document.getElementById('kebabMenu');
+    if (menu && menu.classList.contains('open')) {
+      toggleKebabMenu(false);
+      return;
+    }
+    // global kebab menu
+    const globalMenu = document.getElementById('globalKebabMenu');
+    if (globalMenu && globalMenu.classList.contains('open')) {
+      toggleGlobalKebab(false);
+      return;
+    }
+
+    // existing sidebar handler
+    if (document.body.classList.contains('sidebar-open')) {
+      toggleSidebar(false);
+    }
+  }
+});
+
+// ===== Global Kebab menu toggle (header) =====
+function toggleGlobalKebab(open) {
+  const btn = document.getElementById('globalKebabBtn');
+  const menu = document.getElementById('globalKebabMenu');
+  if (!menu || !btn) return;
+
+  const shouldOpen = typeof open === 'boolean' ? open : !menu.classList.contains('open');
+  if (shouldOpen) {
+    menu.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    menu.setAttribute('aria-hidden', 'false');
+  } else {
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('aria-hidden', 'true');
+  }
+}
+
+// ===== Update kebab visibility helper =====
+function updateKebabVisibility() {
+  const globalWrapper = document.querySelector('.global-kebab');
+  const projectWrapper = document.querySelector('.project-header .kebab-wrapper');
+  const gmenu = document.getElementById('globalKebabMenu');
+  const pmenu = document.getElementById('kebabMenu');
+
+  if (currentProjectId) {
+    // Hide global kebab and close it
+    if (globalWrapper) {
+      globalWrapper.style.display = 'none';
+      if (gmenu && gmenu.classList.contains('open')) toggleGlobalKebab(false);
+    }
+    // Show project kebab (ensure it's visible and not hidden by CSS overrides)
+    if (projectWrapper) {
+      projectWrapper.style.display = 'inline-block';
+    }
+  } else {
+    // No project selected: show global kebab (CSS will handle breakpoint visibility)
+    if (globalWrapper) {
+      globalWrapper.style.display = '';
+    }
+    // Hide project kebab if it exists (we don't want duplicate menus)
+    if (projectWrapper) {
+      projectWrapper.style.display = 'none';
+      if (pmenu && pmenu.classList.contains('open')) toggleKebabMenu(false);
+    }
+  }
+}
