@@ -96,15 +96,6 @@ function updateKebabMenuItems() {
     }
 }
 
-// Close kebab menu when clicking outside
-document.addEventListener('click', function(event) {
-    const kebabContainer = document.querySelector('.kebab-menu-container');
-    const dropdown = document.getElementById('kebabMenuDropdown');
-    
-    if (dropdown && kebabContainer && !kebabContainer.contains(event.target)) {
-        dropdown.classList.remove('active');
-    }
-});
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', initTheme);
@@ -174,7 +165,7 @@ function renderProjectNotes(project) {
             <div class="notes-list">
                 <div class="notes-controls">
                     <input id="notesSearchInput" class="search-input" placeholder="Search notes..." />
-                    <button class="btn-primary" onclick="createNote()">+ New</button>
+                    <button class="btn-primary" onclick="createNote()">Add Note</button>
                 </div>
                 <div id="notesListInner"></div>
             </div>
@@ -253,8 +244,8 @@ function selectNote(noteId) {
     pane.innerHTML = `
         <input class="title" id="noteTitleInput" value="${escapeHtml(note.title)}" placeholder="Note title" />
         <div class="note-editor-tabs">
-            <button class="note-tab note-tab-active" id="noteTabEdit" onclick="switchNoteTab('edit')">✏️ Edit</button>
-            <button class="note-tab" id="noteTabPreview" onclick="switchNoteTab('preview')">👁 Preview</button>
+            <button class="note-tab note-tab-active" id="noteTabEdit" onclick="switchNoteTab('edit')">Edit</button>
+            <button class="note-tab" id="noteTabPreview" onclick="switchNoteTab('preview')">Preview</button>
         </div>
         <textarea id="noteBodyInput" class="editor-body" placeholder="Write your note here (supports Markdown)...">${escapeHtml(note.content)}</textarea>
         <div id="notePreviewArea" class="note-preview" style="display:none;"></div>
@@ -381,7 +372,7 @@ function ensureEntityNotesModal() {
             <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px; border-bottom:1px solid var(--color-border);">
                 <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--color-text);">Notes</h2>
                 <div style="display:flex; gap:12px; align-items:center;">
-                    <button class="btn-primary" id="entityNewNoteBtn" style="padding:8px 16px; font-size:14px;">+ New</button>
+                    <button class="btn-primary" id="entityNewNoteBtn" style="padding:8px 16px; font-size:14px;">Add Note</button>
                     <button class="btn-secondary" id="entityCloseNotes" style="padding:8px 16px; font-size:14px;">Close</button>
                 </div>
             </div>
@@ -1062,7 +1053,36 @@ function toggleTaskDescription(taskId, event) {
         button.title = 'Show description';
     }
 }
+function toggleTaskKebab(event, taskId) {
+  event.stopPropagation();
 
+  closeAllTaskKebabs();
+
+  const menu = document.getElementById(`taskKebab-${taskId}`);
+  if (menu) {
+    menu.classList.toggle('active');
+  }
+}
+
+function closeAllTaskKebabs() {
+  document
+    .querySelectorAll('[id^="taskKebab-"]')
+    .forEach(el => el.classList.remove('active'));
+}
+
+// Close kebab menu when clicking outside
+document.addEventListener('click', function(event) {
+    closeAllTaskKebabs();
+    const kebabContainer = document.querySelector('.kebab-menu-container');
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    
+    if (dropdown && kebabContainer && !kebabContainer.contains(event.target)) {
+        dropdown.classList.remove('active');
+    }
+    /* ---- Task kebabs ---- */
+    closeAllTaskKebabs();
+
+});
 function renderProjectContent() {
     const project = projects.find(p => p.id === currentProjectId);
     if (!project) return;
@@ -1252,14 +1272,19 @@ function renderProjectContent() {
                             </div>
                         </div>
                             <div class="task-actions">
-                                <button class="btn-small" onclick="openNewSessionModal('${task.id}')">+ Session</button>
-                                <button class="btn-small" onclick="openTaskNotes('${task.id}')">Notes</button>
-                                <button class="btn-small" onclick="openEditTaskModal('${task.id}')" style="background: var(--color-primary); color: white; border-color: var(--color-primary);">Edit</button>
-                                <button class="btn-small ${task.completed ? 'btn-ghost' : 'btn-success'}" onclick="toggleTaskComplete('${task.id}')">${task.completed ? 'Undo' : 'Mark Done'}</button>
-                                <button class="btn-small danger" onclick="deleteTask('${task.id}')">Delete</button>
+                                <div class="kebab-menu-container">
+                                    <button class="kebab-menu-btn" onclick="toggleTaskKebab(event, '${task.id}')" title="Task actions"><span class="kebab-icon">⋮</span></button>
+                                    <div class="kebab-menu-dropdown" id="taskKebab-${task.id}">
+                                    <button class="kebab-menu-item" onclick="openNewSessionModal('${task.id}'); closeAllTaskKebabs()">Add Session</button>
+                                    <button class="kebab-menu-item" onclick="openTaskNotes('${task.id}'); closeAllTaskKebabs()">Notes</button>
+                                    <button class="kebab-menu-item" onclick="openEditTaskModal('${task.id}'); closeAllTaskKebabs()">Edit Task</button>
+                                    <button class="kebab-menu-item" onclick="toggleTaskComplete('${task.id}'); closeAllTaskKebabs()">${task.completed ? 'Reopen' : 'Mark Done'}</button>
+                                    <div class="kebab-menu-divider"></div>
+                                    <button class="kebab-menu-item danger" onclick="deleteTask('${task.id}'); closeAllTaskKebabs()">Delete</button>
+                                    </div>
+                                </div>
                             </div>
-                    </div>
-                    
+                        </div>
                     ${task.sessions.length > 0 ? `
                         <div class="task-sessions ${isExpanded ? 'expanded' : ''}">
                             ${task.sessions.map(session => {
@@ -1625,7 +1650,7 @@ function deleteTask(taskId) {
     });
 }
 
-// Toggle a task's completed state (mark as Done / Undo)
+// Toggle a task's completed state (mark as Done / Reopen)
 function toggleTaskComplete(taskId) {
     const project = projects.find(p => p.id === currentProjectId);
     if (!project) return;
