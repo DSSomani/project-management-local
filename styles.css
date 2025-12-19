@@ -1,28 +1,3 @@
-:root {
-    --color-primary: #2180CE;
-    --color-primary-hover: #1a64a0;
-    --color-bg-light: #f8fafc;
-    --color-bg-white: #ffffff;
-    --color-bg-card: #f0f4f8;
-    --color-bg-border: #e2e8f0;
-    --color-text-dark: #1a202c;
-    --color-text-light: #718096;
-    --color-text-muted: #94a3b8;
-    --color-border: #e2e8f0;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-error: #ef4444;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --space-8: 8px;
-    --space-12: 12px;
-    --space-16: 16px;
-    --space-20: 20px;
-    --space-24: 24px;
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -210,7 +185,7 @@ input[type="reset"],
 .view-tab.active {
     background: var(--color-primary);
     color: white;
-    box-shadow: 0 2px 4px rgba(33, 128, 206, 0.3);
+    box-shadow: var(--shadow-active);
 }
 
 .project-list {
@@ -238,7 +213,7 @@ input[type="reset"],
 .project-item.active {
     background: var(--color-bg-card);
     color: var(--color-text-dark);
-    border-color: var(--color-bg-border);
+    border-color: var(--color-border);
 }
 
 .project-item .project-name {
@@ -289,16 +264,17 @@ input[type="reset"],
     flex: 1;
     padding: 8px 10px;
     border-radius: 8px;
+    color: var(--color-text-dark);
     border: 1px solid var(--color-border);
-    background: transparent;
+    background: var(--color-bg-card);
     cursor: pointer;
     font-weight: 700;
     font-size: 13px;
 }
 
 .sidebar-footer .btn-import {
-    background: var(--color-primary);
-    color: white;
+    background: var(--color-primary) !important;
+    color: white !important;
     border-color: transparent;
 }
 
@@ -711,7 +687,7 @@ input[type="reset"],
     color: white;
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-toast);
     animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
     display: flex;
     align-items: center;
@@ -822,7 +798,7 @@ input[type="reset"],
     background: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(33, 128, 206, 0.3);
+    box-shadow: var(--shadow-hover)
 }
 
 .task-description {
@@ -979,6 +955,7 @@ input[type="reset"],
 
 .btn-small {
     padding: 6px 12px;
+    color: var(--color-text-dark);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -1077,13 +1054,21 @@ input[type="reset"],
     margin-bottom: var(--space-8);
     color: var(--color-text-dark);
 }
+#projectEndDateInput{
+    color: var(--color-placeholder);
+}
 
+#taskEndDateInput{
+    color: var(--color-placeholder);
+}
 .form-input,
 .form-select,
 .form-textarea {
     width: 100%;
+    color: var(--color-text-dark);
     padding: var(--space-12);
     border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
     border-radius: var(--radius-md);
     font-size: 14px;
     font-family: inherit;
@@ -1095,7 +1080,7 @@ input[type="reset"],
 .form-textarea:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(33, 128, 206, 0.1);
+    box-shadow:  var(--shadow-focus);
 }
 
 .form-textarea {
@@ -1126,6 +1111,7 @@ input[type="reset"],
 }
 
 .btn-secondary {
+    color: var(--color-text-dark);
     flex: 1;
     padding: var(--space-12) var(--space-20);
     background: var(--color-bg-card);

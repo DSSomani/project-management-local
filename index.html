@@ -7,7 +7,8 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     <title>Project Manager</title>
-    <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <link id="theme-stylesheet" rel="stylesheet" href="light-theme.css">
 </head>
 
 <body>
@@ -21,7 +22,7 @@
                     <div class="view-tabs">
                         <button class="view-tab active" id="activeTab" onclick="switchView('active')">
                             <span
-                                style="display:inline-block; width:10px; height:10px; background:#28c76f; border-radius:50%; animation:pulse 1.5s infinite;"></span>
+                                style="display:inline-block; width:10px; height:10px; background: var(--color-success); border-radius:50%; animation:pulse 1.5s infinite;"></span>
                             Active
                         </button>
                         <button class="view-tab" id="archivedTab" onclick="switchView('archived')">
@@ -31,7 +32,7 @@
                         </button>
                         <button class="view-tab" id="habitsTab" onclick="switchView('habits')">
                             <span
-                                style=" display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:50%;"></span>
+                                style=" display:inline-block; width:10px; height:10px; background:var(--color-primary); border-radius:50%;"></span>
                             Habits
                         </button>
                     </div>
