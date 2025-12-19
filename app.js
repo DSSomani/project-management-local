@@ -23,20 +23,15 @@ function toggleTheme() {
 }
 
 function applyTheme(theme) {
-    const stylesheet = document.getElementById('theme-stylesheet');
-    const themeIcon = document.getElementById('themeIcon');
-    const kebabThemeIcon = document.getElementById('kebabThemeIcon');
+  const stylesheet = document.getElementById('theme-stylesheet');
 
-    if (theme === 'dark') {
-        stylesheet.href = 'dark-theme.css';
-        if (themeIcon) themeIcon.textContent = '☀️';
-        if (kebabThemeIcon) kebabThemeIcon.textContent = '☀️';
-    } else {
-        stylesheet.href = 'styles.css'; // 
-        if (themeIcon) themeIcon.textContent = '🌙';
-        if (kebabThemeIcon) kebabThemeIcon.textContent = '🌙';
-    }
+  if (theme === 'dark') {
+    stylesheet.href = 'dark-theme.css';
+  } else {
+    stylesheet.href = 'light-theme-copy.css';
+  }
 }
+
 function toggleSidebarCollapse() {
   const sidebar = document.getElementById('sidebar');
 
