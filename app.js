@@ -28,7 +28,7 @@ function applyTheme(theme) {
   if (theme === 'dark') {
     stylesheet.href = 'dark-theme.css';
   } else {
-    stylesheet.href = 'light-theme-copy.css';
+    stylesheet.href = 'light-theme.css';
   }
 }
 

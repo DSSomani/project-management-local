@@ -213,7 +213,7 @@ input[type="reset"],
 .project-item.active {
     background: var(--color-bg-card);
     color: var(--color-text-dark);
-    border-color: var(--color-bg-border);
+    border-color: var(--color-border);
 }
 
 .project-item .project-name {
@@ -955,6 +955,7 @@ input[type="reset"],
 
 .btn-small {
     padding: 6px 12px;
+    color: var(--color-text-dark);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -1053,13 +1054,21 @@ input[type="reset"],
     margin-bottom: var(--space-8);
     color: var(--color-text-dark);
 }
+#projectEndDateInput{
+    color: var(--color-placeholder);
+}
 
+#taskEndDateInput{
+    color: var(--color-placeholder);
+}
 .form-input,
 .form-select,
 .form-textarea {
     width: 100%;
+    color: var(--color-text-dark);
     padding: var(--space-12);
     border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
     border-radius: var(--radius-md);
     font-size: 14px;
     font-family: inherit;
@@ -1102,6 +1111,7 @@ input[type="reset"],
 }
 
 .btn-secondary {
+    color: var(--color-text-dark);
     flex: 1;
     padding: var(--space-12) var(--space-20);
     background: var(--color-bg-card);
