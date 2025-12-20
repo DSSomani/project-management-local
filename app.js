@@ -23,17 +23,89 @@ function toggleTheme() {
 }
 
 function applyTheme(theme) {
-    const stylesheet = document.getElementById('theme-stylesheet');
-    const themeIcon = document.getElementById('themeIcon');
+  const stylesheet = document.getElementById('theme-stylesheet');
 
-    if (theme === 'dark') {
-        stylesheet.href = 'dark-theme.css';
-        if (themeIcon) themeIcon.textContent = '☀️';
+  if (theme === 'dark') {
+    stylesheet.href = 'dark-theme.css';
+  } else {
+    stylesheet.href = 'light-theme.css';
+  }
+}
+
+function toggleMobileSidebar(forceClose = false) {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+
+  const isOpen = sidebar.classList.contains('open');
+
+  if (forceClose || isOpen) {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('active');
+  } else {
+    sidebar.classList.add('open');
+    backdrop.classList.add('active');
+  }
+}
+
+function toggleSidebarCollapse() {
+  const sidebar = document.getElementById('sidebar');
+
+  if (!sidebar) {
+    console.error('Sidebar element not found');
+    return;
+  }
+
+  sidebar.classList.toggle('collapsed');
+
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  localStorage.setItem('sidebarCollapsed', isCollapsed);
+}
+
+
+// Restore state on load
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+  if (collapsed) {
+    sidebar.classList.add('collapsed');
+  }
+});
+
+// Kebab Menu Functions
+function toggleKebabMenu(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    dropdown.classList.toggle('active');
+    
+    // Update menu items based on current project selection
+    updateKebabMenuItems();
+}
+
+function closeKebabMenu() {
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    dropdown.classList.remove('active');
+}
+
+function updateKebabMenuItems() {
+    const projectMenuOptions = document.getElementById('projectMenuOptions');
+    const archiveText = document.getElementById('archiveText');
+    
+    if (currentProjectId) {
+        // Show project-specific options when a project is selected
+        projectMenuOptions.classList.add('show');
+        
+        // Update archive/unarchive text based on current view
+        const project = projects.find(p => p.id === currentProjectId);
+        if (project) {
+            archiveText.textContent = project.archived ? 'Unarchive' : 'Archive';
+        }
     } else {
-        stylesheet.href = 'styles.css'; // 
-        if (themeIcon) themeIcon.textContent = '🌙';
+        // Hide project-specific options when no project is selected
+        projectMenuOptions.classList.remove('show');
     }
 }
+
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', initTheme);
@@ -103,7 +175,7 @@ function renderProjectNotes(project) {
             <div class="notes-list">
                 <div class="notes-controls">
                     <input id="notesSearchInput" class="search-input" placeholder="Search notes..." />
-                    <button class="btn-primary" onclick="createNote()">+ New</button>
+                    <button class="btn-primary" onclick="createNote()">Add Note</button>
                 </div>
                 <div id="notesListInner"></div>
             </div>
@@ -182,8 +254,8 @@ function selectNote(noteId) {
     pane.innerHTML = `
         <input class="title" id="noteTitleInput" value="${escapeHtml(note.title)}" placeholder="Note title" />
         <div class="note-editor-tabs">
-            <button class="note-tab note-tab-active" id="noteTabEdit" onclick="switchNoteTab('edit')">✏️ Edit</button>
-            <button class="note-tab" id="noteTabPreview" onclick="switchNoteTab('preview')">👁 Preview</button>
+            <button class="note-tab note-tab-active" id="noteTabEdit" onclick="switchNoteTab('edit')">Edit</button>
+            <button class="note-tab" id="noteTabPreview" onclick="switchNoteTab('preview')">Preview</button>
         </div>
         <textarea id="noteBodyInput" class="editor-body" placeholder="Write your note here (supports Markdown)...">${escapeHtml(note.content)}</textarea>
         <div id="notePreviewArea" class="note-preview" style="display:none;"></div>
@@ -308,9 +380,9 @@ function ensureEntityNotesModal() {
     modal.innerHTML = `
         <div style="width:1200px; max-width:95%; max-height:90vh; background:var(--color-bg-white); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px; border-bottom:1px solid var(--color-border);">
-                <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--color-text);">Notes</h2>
+                <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--color-text);"> Notes</h2>
                 <div style="display:flex; gap:12px; align-items:center;">
-                    <button class="btn-primary" id="entityNewNoteBtn" style="padding:8px 16px; font-size:14px;">+ New</button>
+                    <button class="btn-primary" id="entityNewNoteBtn" style="padding:8px 16px; font-size:14px;">Add Note</button>
                     <button class="btn-secondary" id="entityCloseNotes" style="padding:8px 16px; font-size:14px;">Close</button>
                 </div>
             </div>
@@ -710,6 +782,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadProjects();
     await loadHabitsData(); // Load habits from localStorage
     setupSessionCalculation();
+    updateKebabMenuItems(); // Initialize kebab menu state
 });
 
 // Logout function
@@ -953,6 +1026,7 @@ function switchView(view) {
     `;
     // Render chart after we've inserted the HTML (if a financial canvas exists)
     setTimeout(() => renderSpendingChart(), 0);
+    updateKebabMenuItems(); // Update kebab menu when view is switched
 }
 
 function selectProject(projectId) {
@@ -960,6 +1034,7 @@ function selectProject(projectId) {
     expandedTasks.clear(); // Reset expanded tasks when switching projects
     renderProjectList();
     renderProjectContent();
+    updateKebabMenuItems(); // Update kebab menu based on project selection
 }
 
 function toggleTaskSessions(taskId) {
@@ -988,7 +1063,36 @@ function toggleTaskDescription(taskId, event) {
         button.title = 'Show description';
     }
 }
+function toggleTaskKebab(event, taskId) {
+  event.stopPropagation();
 
+  closeAllTaskKebabs();
+
+  const menu = document.getElementById(`taskKebab-${taskId}`);
+  if (menu) {
+    menu.classList.toggle('active');
+  }
+}
+
+function closeAllTaskKebabs() {
+  document
+    .querySelectorAll('[id^="taskKebab-"]')
+    .forEach(el => el.classList.remove('active'));
+}
+
+// Close kebab menu when clicking outside
+document.addEventListener('click', function(event) {
+    closeAllTaskKebabs();
+    const kebabContainer = document.querySelector('.kebab-menu-container');
+    const dropdown = document.getElementById('kebabMenuDropdown');
+    
+    if (dropdown && kebabContainer && !kebabContainer.contains(event.target)) {
+        dropdown.classList.remove('active');
+    }
+    /* ---- Task kebabs ---- */
+    closeAllTaskKebabs();
+
+});
 function renderProjectContent() {
     const project = projects.find(p => p.id === currentProjectId);
     if (!project) return;
@@ -1024,58 +1128,7 @@ function renderProjectContent() {
     <span class="project-title">${project.name}</span>
     ${daysLeftHTML}
   </div>
-
-  <div class="project-header-right">
-    <div class="project-subtabs">
-      <!-- Tasks tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'tasks' ? 'btn-subtab-active' : ''}"
-        id="subtabTasks"
-        onclick="switchProjectSubview('tasks')"
-      >
-        <span class="icon-dot icon-dot-primary"></span>
-        <span>Tasks</span>
-      </button>
-
-      <!-- Notes tab -->
-      <button
-        class="btn-subtab ${currentProjectSubView === 'notes' ? 'btn-subtab-active' : ''}"
-        id="subtabNotes"
-        onclick="switchProjectSubview('notes')"
-      >
-        <span class="icon-dot icon-dot-yellow"></span>
-        <span>Notes</span>
-      </button>
-    </div>
-
-    <!-- Edit -->
-    <button
-      class="btn-action btn-action-edit"
-      onclick="openEditProjectModal()"
-    >
-      <span class="icon-dash">—</span>
-      <span>Edit</span>
-    </button>
-
-    <!-- Archive / Unarchive -->
-    <button
-      class="btn-action btn-action-archive"
-      onclick="toggleArchiveProject()"
-    >
-      <span class="icon-dot ${project.archived ? 'icon-dot-green' : 'icon-dot-gray'}"></span>
-      <span>${project.archived ? 'Unarchive' : 'Archive'}</span>
-    </button>
-
-    <!-- Delete -->
-    <button
-      class="btn-action btn-action-delete"
-      onclick="deleteProject()"
-    >
-      <span class="icon-dot icon-dot-red"></span>
-      <span>Delete</span>
-    </button>
-  </div>
-</div>`;
+`;
 
     // If the selected project subview is Notes, render notes and skip the tasks renderer
     if (currentProjectSubView === 'notes') {
@@ -1129,11 +1182,11 @@ function renderProjectContent() {
                             <div style="font-weight:600;">#${session.sessionNo}</div>
                             ${session.name ? `<div style="font-size:12px; color:var(--color-text-light); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(session.name)}</div>` : ''}
                         </div>
-                        <div>
+                        <div class="started-info">
                             <div class="session-label">Started</div>
                             <div style="font-size:13px;">${new Date(session.startedAt).toLocaleString()}</div>
                         </div>
-                        <div>
+                        <div class="ended-info">
                             <div class="session-label">Ended</div>
                             <div style="font-size:13px;">${session.endedAt ? new Date(session.endedAt).toLocaleString() : '<span style="color:var(--color-warning); font-weight:600;">Running</span>'}</div>
                         </div>
@@ -1145,8 +1198,14 @@ function renderProjectContent() {
                             <div class="session-label">Duration</div>
                             <div style="font-size:13px; font-weight:600; color:var(--color-primary);">${session.durationMinutes !== null ? `${Math.floor(session.durationMinutes / 60)}h ${session.durationMinutes % 60}m` : 'Running'}</div>
                         </div>
-                        ${session.endedAt ? `<button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
-                                ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
+                        ${session.endedAt ? `<button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; ">Stop</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip" viewBox="0 0 16 16">
+  <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+  <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z"/>
+</svg></button></div>`}
+                                ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('', '${session.id}')" style="padding:4px 8px;">Stop</button><button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip" viewBox="0 0 16 16">
+  <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+  <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z"/>
+</svg></button></div>`}
                     </div>
                 `).join('')}
             </div>
@@ -1229,14 +1288,19 @@ function renderProjectContent() {
                             </div>
                         </div>
                             <div class="task-actions">
-                                <button class="btn-small" onclick="openNewSessionModal('${task.id}')">+ Session</button>
-                                <button class="btn-small" onclick="openTaskNotes('${task.id}')">Notes</button>
-                                <button class="btn-small" onclick="openEditTaskModal('${task.id}')" style="background: var(--color-primary); color: white; border-color: var(--color-primary);">Edit</button>
-                                <button class="btn-small ${task.completed ? 'btn-ghost' : 'btn-success'}" onclick="toggleTaskComplete('${task.id}')">${task.completed ? 'Undo' : 'Mark Done'}</button>
-                                <button class="btn-small danger" onclick="deleteTask('${task.id}')">Delete</button>
+                                <div class="kebab-menu-container">
+                                    <button class="kebab-menu-btn" onclick="toggleTaskKebab(event, '${task.id}')" title="Task actions"><span class="kebab-icon">⋮</span></button>
+                                    <div class="kebab-menu-dropdown" id="taskKebab-${task.id}">
+                                    <button class="kebab-menu-item" onclick="openNewSessionModal('${task.id}'); closeAllTaskKebabs()">Add Session</button>
+                                    <button class="kebab-menu-item" onclick="openTaskNotes('${task.id}'); closeAllTaskKebabs()">Notes</button>
+                                    <button class="kebab-menu-item" onclick="openEditTaskModal('${task.id}'); closeAllTaskKebabs()">Edit Task</button>
+                                    <button class="kebab-menu-item" onclick="toggleTaskComplete('${task.id}'); closeAllTaskKebabs()">${task.completed ? 'Reopen' : 'Mark Done'}</button>
+                                    <div class="kebab-menu-divider"></div>
+                                    <button class="kebab-menu-item danger" onclick="deleteTask('${task.id}'); closeAllTaskKebabs()">Delete</button>
+                                    </div>
+                                </div>
                             </div>
-                    </div>
-                    
+                        </div>
                     ${task.sessions.length > 0 ? `
                         <div class="task-sessions ${isExpanded ? 'expanded' : ''}">
                             ${task.sessions.map(session => {
@@ -1254,11 +1318,11 @@ function renderProjectContent() {
                                             <div style="font-weight: 600;">#${session.sessionNo}</div>
                                             ${session.name ? `<div style="font-size:12px; color:var(--color-text-light); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(session.name)}</div>` : ''}
                                         </div>
-                                        <div>
+                                        <div class="started-info">
                                             <div class="session-label">Started</div>
                                             <div style="font-size: 13px;">${new Date(session.startedAt).toLocaleString()}</div>
                                         </div>
-                                        <div>
+                                        <div class="ended-info">
                                             <div class="session-label">Ended</div>
                                             <div style="font-size:13px;">${endedHtml}</div>
                                         </div>
@@ -1267,7 +1331,10 @@ function renderProjectContent() {
                                             <div class="session-label">Duration</div>
                                             <div style="font-size: 13px; font-weight: 600; color: var(--color-primary);">${durationHtml}</div>
                                         </div>
-                                        ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('${task.id}', '${session.id}')" style="padding: 4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('${task.id}', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession('${task.id}', '${session.id}')">ℹ️</button></div>`}
+                                        ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('${task.id}', '${session.id}')" style="padding: 4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('${task.id}', '${session.id}')" style="padding:4px 8px;">Stop</button><button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession('${task.id}', '${session.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pip" viewBox="0 0 16 16">
+  <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+  <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5z"/>
+</svg></button></div>`}
                                     </div>
                                 `;
             }).join('')}
@@ -1279,8 +1346,10 @@ function renderProjectContent() {
     }
 
     document.getElementById('content').innerHTML = html;
-}
+    updateKebabMenuItems(); // Update kebab menu when content is rendered
+    applyMobileSessionVisibility();
 
+}
 function openNewProjectModal() {
     document.getElementById('projectNameInput').value = '';
     document.getElementById('projectDescInput').value = '';
@@ -1601,7 +1670,7 @@ function deleteTask(taskId) {
     });
 }
 
-// Toggle a task's completed state (mark as Done / Undo)
+// Toggle a task's completed state (mark as Done / Reopen)
 function toggleTaskComplete(taskId) {
     const project = projects.find(p => p.id === currentProjectId);
     if (!project) return;
@@ -1808,7 +1877,7 @@ async function openFloatingSession(taskId, sessionId) {
             </div>
             <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
                 <button class="btn-secondary" id="pip-open-btn-${sessionId}">Open</button>
-                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small" id="pip-stop-btn-${sessionId}" style="background: var(--color-warning); color:#fff;">Stop</button>`}
+                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small danger" id="pip-stop-btn-${sessionId}">Stop</button>`}
             </div>
         </div>
     `;
@@ -2624,10 +2693,49 @@ switchView = function (view) {
             </div>
         `;
     }
+    updateKebabMenuItems(); // Update kebab menu when view is switched
 };
 
 // Initialize habits on load
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize streaks display
     updateStreakDisplay();
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const backdrop = document.getElementById('sidebarBackdrop');
+
+  if (backdrop) {
+    backdrop.addEventListener('click', () => toggleMobileSidebar(true));
+  }
+});
+
+function applyMobileSessionVisibility() {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  document.querySelectorAll('.started-info, .ended-info').forEach(el => {
+    if (isMobile) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', applyMobileSessionVisibility);
+
+// Run on resize
+window.addEventListener('resize', applyMobileSessionVisibility);
+ 
+const sessionObserver = new MutationObserver(() => {
+  applyMobileSessionVisibility();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const content = document.getElementById('content');
+  if (content) {
+    sessionObserver.observe(content, { childList: true, subtree: true });
+  }
 });

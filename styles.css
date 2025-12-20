@@ -1,28 +1,3 @@
-:root {
-    --color-primary: #2180CE;
-    --color-primary-hover: #1a64a0;
-    --color-bg-light: #f8fafc;
-    --color-bg-white: #ffffff;
-    --color-bg-card: #f0f4f8;
-    --color-bg-border: #e2e8f0;
-    --color-text-dark: #1a202c;
-    --color-text-light: #718096;
-    --color-text-muted: #94a3b8;
-    --color-border: #e2e8f0;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-error: #ef4444;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --space-8: 8px;
-    --space-12: 12px;
-    --space-16: 16px;
-    --space-20: 20px;
-    --space-24: 24px;
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -61,16 +36,120 @@ input[type="reset"],
 .sidebar {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: top;
+    width: 320px;
     max-width: 320px;
-    width: fit-content;
-    max-width: 320px;    
+    height: 100vh; /* full viewport height */
+    min-height: 100vh;
     background: var(--color-bg-white);
     border-right: 1px solid var(--color-border);
     padding: var(--space-20);
     overflow-y: auto;
     box-shadow: var(--shadow-sm);
 }
+/* --- Collapsible Sidebar --- */
+.sidebar {
+  transition:
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: width;
+}
+
+/* Collapsed state */
+.sidebar.collapsed {
+  width: 56px;
+  padding: 12px 8px;
+  overflow: hidden;
+}
+
+/* Hide text when collapsed */
+.sidebar.collapsed *:not(.sidebar-collapse-btn) {
+  white-space: nowrap;
+}
+
+/* Collapse button */
+.sidebar-collapse-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--color-text-light);
+}
+
+.sidebar-collapse-btn:hover {
+  color: var(--color-text-dark);
+}
+
+/* Expand button (when collapsed) */
+.sidebar-expand-btn {
+  position: absolute;
+  left: 8px;
+  top: 16px;
+  z-index: 2000;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: none;
+}
+
+.sidebar-collapse-btn::before {
+  content: "«";
+}
+
+.sidebar.collapsed .sidebar-collapse-btn::before {
+  content: "»";
+}
+ 
+/* Show expand button only when sidebar collapsed */
+.sidebar.collapsed + .sidebar-expand-btn {
+    position: absolute;
+  display: block;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Collapsed state */
+.sidebar.collapsed .sidebar-content {
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+}
+
+.sidebar.collapsed {
+  transition-delay: 0s;
+}
+
+.sidebar.collapsed .sidebar-content {
+  transition-delay: 0.05s;
+}
+
+.sidebar-expand-btn {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.sidebar.collapsed + .sidebar-expand-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
 
 .sidebar h2 {
     font-size: 18px;
@@ -108,7 +187,7 @@ input[type="reset"],
 .view-tab.active {
     background: var(--color-primary);
     color: white;
-    box-shadow: 0 2px 4px rgba(33, 128, 206, 0.3);
+    box-shadow: var(--shadow-active);
 }
 
 .project-list {
@@ -117,7 +196,9 @@ input[type="reset"],
 
 .project-item {
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 12px;
     color: var(--color-text-light);
     padding: var(--space-12) var(--space-16);
     margin-bottom: var(--space-8);
@@ -136,21 +217,30 @@ input[type="reset"],
 .project-item.active {
     background: var(--color-bg-card);
     color: var(--color-text-dark);
-    border-color: var(--color-bg-border);
+    border-color: var(--color-border);
 }
 
 .project-item .project-name {
     font-weight: 600;
     font-size: 14px;
     margin-bottom: 4px;
+    flex: 1;
+    min-width: 0;                 /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .project-item .task-count {
+    flex-shrink: 0;               /* Never wrap or shrink */
+    white-space: nowrap;
     font-size: 12px;
     opacity: 0.7;
 }
 
 .btn-new-project {
+    position: sticky;
+    bottom: 50px;
     width: 100%;
     padding: var(--space-12) var(--space-16);
     background: var(--color-primary);
@@ -169,9 +259,12 @@ input[type="reset"],
 
 /* Sidebar footer (export/import) */
 .sidebar-footer {
+    position: sticky;
+    bottom: 0;
     margin-top: 24px;
     padding-top: 12px;
     border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-white);
     display: flex;
     gap: 8px;
     justify-content: space-between;
@@ -182,16 +275,17 @@ input[type="reset"],
     flex: 1;
     padding: 8px 10px;
     border-radius: 8px;
+    color: var(--color-text-dark);
     border: 1px solid var(--color-border);
-    background: transparent;
+    background: var(--color-bg-card);
     cursor: pointer;
     font-weight: 700;
     font-size: 13px;
 }
 
 .sidebar-footer .btn-import {
-    background: var(--color-primary);
-    color: white;
+    background: var(--color-primary) !important;
+    color: white !important;
     border-color: transparent;
 }
 
@@ -219,8 +313,23 @@ input[type="reset"],
 
 .header h1 {
     font-size: 28px;
+    margin-right: 16px;
     color: var(--color-text-dark);
     width: 86%;
+}
+.header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+#projectTitle {
+  flex: 1;
+  min-width: 0;              /* ⭐ THIS IS THE FIX */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Theme Toggle Button */
@@ -604,7 +713,7 @@ input[type="reset"],
     color: white;
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-toast);
     animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
     display: flex;
     align-items: center;
@@ -650,6 +759,7 @@ input[type="reset"],
     align-items: start;
     gap: var(--space-12);
     flex: 1;
+    min-width: 0;
 }
 
 .task-expand-btn {
@@ -684,11 +794,11 @@ input[type="reset"],
     font-size: 16px;
     font-weight: 600;
     color: var(--color-text-dark);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     flex: 1;
-    min-width: 0;
+    min-width: 0;                 /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .task-title-container {
@@ -696,6 +806,11 @@ input[type="reset"],
     align-items: center;
     gap: 12px;
     width: 100%;
+    flex: 1;
+    min-width: 0;                 /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .task-desc-toggle {
@@ -715,7 +830,7 @@ input[type="reset"],
     background: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(33, 128, 206, 0.3);
+    box-shadow: var(--shadow-hover)
 }
 
 .task-description {
@@ -872,6 +987,7 @@ input[type="reset"],
 
 .btn-small {
     padding: 6px 12px;
+    color: var(--color-text-dark);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -970,13 +1086,21 @@ input[type="reset"],
     margin-bottom: var(--space-8);
     color: var(--color-text-dark);
 }
+#projectEndDateInput{
+    color: var(--color-placeholder);
+}
 
+#taskEndDateInput{
+    color: var(--color-placeholder);
+}
 .form-input,
 .form-select,
 .form-textarea {
     width: 100%;
+    color: var(--color-text-dark);
     padding: var(--space-12);
     border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
     border-radius: var(--radius-md);
     font-size: 14px;
     font-family: inherit;
@@ -988,7 +1112,7 @@ input[type="reset"],
 .form-textarea:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(33, 128, 206, 0.1);
+    box-shadow:  var(--shadow-focus);
 }
 
 .form-textarea {
@@ -1019,6 +1143,7 @@ input[type="reset"],
 }
 
 .btn-secondary {
+    color: var(--color-text-dark);
     flex: 1;
     padding: var(--space-12) var(--space-20);
     background: var(--color-bg-card);
@@ -1451,7 +1576,9 @@ input[type="reset"],
     color: var(--color-text-light);
     font-size: 13px;
 }
-
+.btn-icon {
+  color: var(--color-text-dark);
+}
 /* Add Habit Button in Category */
 .btn-add-habit {
     display: flex;
@@ -1594,14 +1721,15 @@ input[type="reset"],
     }
 
     .sidebar {
-        width: fit-content;
+        width: 280px;
         max-width: 320px;
         border-right: none;
         border-bottom: 1px solid var(--color-border);
-        max-height: 200px;
+        height: 100vh; /* full viewport height on small screens */
         display: flex;
         gap: var(--space-16);
         align-items: start;
+        overflow-y: auto;
     }
 
     .session-row {
@@ -1619,3 +1747,119 @@ input[type="reset"],
   70% { box-shadow:0 0 0 10px rgba(40,199,111,0); }
   100% { box-shadow:0 0 0 0 rgba(40,199,111,0); }
 }
+
+/* Kebab Menu Styles */
+.kebab-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.kebab-menu-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    /* font-family: 'Space Mono', monospace; */
+}
+
+.kebab-menu-btn:hover {
+    background: var(--color-bg-card);
+    /* border-color: var(--color-border-hover); */
+}
+
+.kebab-menu-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12);
+    border-radius: 8px;
+}
+
+.kebab-icon {
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-text-light);
+    font-weight: bold;
+    letter-spacing: -2px;
+}
+
+.kebab-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 160px;
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 8px;
+    display: none;
+    z-index: 1000;
+    animation: fadeInDown 0.2s ease;
+}
+
+.kebab-menu-dropdown.active {
+    display: block;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.kebab-menu-item {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text-dark);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    font-family: 'Space Mono', monospace;
+}
+
+
+.kebab-menu-item:hover {
+    background: var(--color-bg-card);
+}
+
+.kebab-menu-item:focus {
+    background: var(--color-bg-card);
+    transform: scale(0.98);
+}
+.danger {
+    color: var(--color-error);
+    font-weight: 600;
+}
+.kebab-menu-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 8px 0;
+}
+
+/* Hide project menu options by default */
+.kebab-menu-section#projectMenuOptions {
+    display: none;
+}
+
+/* Show when project is selected */
+.kebab-menu-section#projectMenuOptions.show {
+    display: block;
+}
+
