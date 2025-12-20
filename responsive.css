@@ -19,6 +19,7 @@
   #projectTitle {
     font-size: 18px;
   }
+
   /* Stack container vertically */
   .container {
     flex-direction: column;
@@ -35,7 +36,7 @@
     padding: 16px;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    box-shadow: 20px 0 40px rgba(0,0,0,0.25);
+    box-shadow: 20px 0 40px rgba(0, 0, 0, 0.25);
   }
 
   /* Reduce sidebar font sizes for mobile */
@@ -43,16 +44,19 @@
     font-size: 16px;
     margin-bottom: 12px;
   }
+
   .sidebar .sidebar-content {
-     width: 280px;
+    width: 280px;
     max-width: 360px;
     gap: 12px;
   }
+
   .sidebar.collapsed .sidebar-content {
     opacity: 1;
     transform: none;
     pointer-events: auto;
   }
+
   .view-tab {
     padding: 8px 12px;
     font-size: 12px;
@@ -165,16 +169,61 @@
     max-height: none;
   }
 
+  .stats-grid {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .stat-label {
+    font-size: var(--space-8) !important;
+  }
+
+  .stat-value {
+    font-size: var(--space-16) !important;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
   /* Task cards wrap properly */
   .task-header {
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
+  }
+
+  .task-header-left {
+    display: flex;
+      width: 80%;
+
+    align-items: start;
+    gap: var(--space-12);
+    flex: 1;
+    min-width: 0;
   }
 
   .task-title {
     white-space: normal;
+    flex: 1;
+    min-width: 0;
+    /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .task-title-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    flex: 1;
+    min-width: 0;
+    /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
+
 #mobileMenuBtn {
   display: none;
 }

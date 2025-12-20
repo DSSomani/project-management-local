@@ -329,7 +329,7 @@ input[type="reset"],
   min-width: 0;              /* ⭐ THIS IS THE FIX */
   overflow: hidden;
   text-overflow: ellipsis;
-  text: nowrap
+  white-space: nowrap;
 }
 
 /* Theme Toggle Button */
@@ -759,6 +759,7 @@ input[type="reset"],
     align-items: start;
     gap: var(--space-12);
     flex: 1;
+    min-width: 0;
 }
 
 .task-expand-btn {
@@ -793,11 +794,11 @@ input[type="reset"],
     font-size: 16px;
     font-weight: 600;
     color: var(--color-text-dark);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     flex: 1;
-    min-width: 0;
+    min-width: 0;                 /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .task-title-container {
@@ -805,6 +806,11 @@ input[type="reset"],
     align-items: center;
     gap: 12px;
     width: 100%;
+    flex: 1;
+    min-width: 0;                 /* REQUIRED for ellipsis */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .task-desc-toggle {
