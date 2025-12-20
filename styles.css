@@ -36,9 +36,9 @@ input[type="reset"],
 .sidebar {
     display: flex;
     flex-direction: column;
-    /* justify-content: top; */
-    max-width: 380px;
-    width: fit-content;
+    justify-content: top;
+    width: 360px;
+    max-width: 360px;
     height: 100vh; /* full viewport height */
     min-height: 100vh;
     background: var(--color-bg-white);
@@ -1689,7 +1689,7 @@ input[type="reset"],
     }
 
     .sidebar {
-        width: fit-content;
+        width: 280px;
         max-width: 320px;
         border-right: none;
         border-bottom: 1px solid var(--color-border);
