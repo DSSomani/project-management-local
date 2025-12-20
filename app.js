@@ -1877,7 +1877,7 @@ async function openFloatingSession(taskId, sessionId) {
             </div>
             <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
                 <button class="btn-secondary" id="pip-open-btn-${sessionId}">Open</button>
-                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small danger" id="pip-stop-btn-${sessionId}" style="background: var(--color-warning); color: var(--color-error);">Stop</button>`}
+                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small danger" id="pip-stop-btn-${sessionId}">Stop</button>`}
             </div>
         </div>
     `;
