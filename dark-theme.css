@@ -52,3 +52,10 @@
     --space-20: 20px;
     --space-24: 24px;
 }
+
+/* Ensure sidebar occupies full viewport height and allows scrolling (Dark theme) */
+.sidebar {
+  height: 100vh;
+  min-height: 100vh;
+  overflow-y: auto;
+}

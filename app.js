@@ -32,6 +32,21 @@ function applyTheme(theme) {
   }
 }
 
+function toggleMobileSidebar(forceClose = false) {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+
+  const isOpen = sidebar.classList.contains('open');
+
+  if (forceClose || isOpen) {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('active');
+  } else {
+    sidebar.classList.add('open');
+    backdrop.classList.add('active');
+  }
+}
+
 function toggleSidebarCollapse() {
   const sidebar = document.getElementById('sidebar');
 
@@ -2675,4 +2690,13 @@ switchView = function (view) {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize streaks display
     updateStreakDisplay();
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const backdrop = document.getElementById('sidebarBackdrop');
+
+  if (backdrop) {
+    backdrop.addEventListener('click', () => toggleMobileSidebar(true));
+  }
 });

@@ -39,6 +39,8 @@ input[type="reset"],
     /* justify-content: top; */
     max-width: 380px;
     width: fit-content;
+    height: 100vh; /* full viewport height */
+    min-height: 100vh;
     background: var(--color-bg-white);
     border-right: 1px solid var(--color-border);
     padding: var(--space-20);
@@ -1691,10 +1693,11 @@ input[type="reset"],
         max-width: 320px;
         border-right: none;
         border-bottom: 1px solid var(--color-border);
-        max-height: 200px;
+        height: 100vh; /* full viewport height on small screens */
         display: flex;
         gap: var(--space-16);
         align-items: start;
+        overflow-y: auto;
     }
 
     .session-row {
