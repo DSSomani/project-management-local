@@ -380,7 +380,7 @@ function ensureEntityNotesModal() {
     modal.innerHTML = `
         <div style="width:1200px; max-width:95%; max-height:90vh; background:var(--color-bg-white); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.3); display:flex; flex-direction:column;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px; border-bottom:1px solid var(--color-border);">
-                <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--color-text);">Notes</h2>
+                <h2 style="margin:0; font-size:20px; font-weight:700; color:var(--color-text);"> Notes</h2>
                 <div style="display:flex; gap:12px; align-items:center;">
                     <button class="btn-primary" id="entityNewNoteBtn" style="padding:8px 16px; font-size:14px;">Add Note</button>
                     <button class="btn-secondary" id="entityCloseNotes" style="padding:8px 16px; font-size:14px;">Close</button>
@@ -1182,11 +1182,11 @@ function renderProjectContent() {
                             <div style="font-weight:600;">#${session.sessionNo}</div>
                             ${session.name ? `<div style="font-size:12px; color:var(--color-text-light); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(session.name)}</div>` : ''}
                         </div>
-                        <div>
+                        <div class="started-info">
                             <div class="session-label">Started</div>
                             <div style="font-size:13px;">${new Date(session.startedAt).toLocaleString()}</div>
                         </div>
-                        <div>
+                        <div class="ended-info">
                             <div class="session-label">Ended</div>
                             <div style="font-size:13px;">${session.endedAt ? new Date(session.endedAt).toLocaleString() : '<span style="color:var(--color-warning); font-weight:600;">Running</span>'}</div>
                         </div>
@@ -1198,8 +1198,8 @@ function renderProjectContent() {
                             <div class="session-label">Duration</div>
                             <div style="font-size:13px; font-weight:600; color:var(--color-primary);">${session.durationMinutes !== null ? `${Math.floor(session.durationMinutes / 60)}h ${session.durationMinutes % 60}m` : 'Running'}</div>
                         </div>
-                        ${session.endedAt ? `<button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
-                                ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
+                        ${session.endedAt ? `<button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('', '${session.id}')" style="padding:4px 8px; ">Stop</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
+                                ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('', '${session.id}')" style="padding:4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('', '${session.id}')" style="padding:4px 8px;">Stop</button><button class="btn-small" onclick="openSessionNotes('','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession(null, '${session.id}')">ℹ️</button></div>`}
                     </div>
                 `).join('')}
             </div>
@@ -1312,11 +1312,11 @@ function renderProjectContent() {
                                             <div style="font-weight: 600;">#${session.sessionNo}</div>
                                             ${session.name ? `<div style="font-size:12px; color:var(--color-text-light); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(session.name)}</div>` : ''}
                                         </div>
-                                        <div>
+                                        <div class="started-info">
                                             <div class="session-label">Started</div>
                                             <div style="font-size: 13px;">${new Date(session.startedAt).toLocaleString()}</div>
                                         </div>
-                                        <div>
+                                        <div class="ended-info">
                                             <div class="session-label">Ended</div>
                                             <div style="font-size:13px;">${endedHtml}</div>
                                         </div>
@@ -1325,7 +1325,7 @@ function renderProjectContent() {
                                             <div class="session-label">Duration</div>
                                             <div style="font-size: 13px; font-weight: 600; color: var(--color-primary);">${durationHtml}</div>
                                         </div>
-                                        ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('${task.id}', '${session.id}')" style="padding: 4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small" onclick="stopSession('${task.id}', '${session.id}')" style="padding:4px 8px; background: var(--color-warning); color:#fff;">Stop</button><button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession('${task.id}', '${session.id}')">ℹ️</button></div>`}
+                                        ${session.endedAt ? `<button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-small danger" onclick="deleteSession('${task.id}', '${session.id}')" style="padding: 4px 8px;">✕</button>` : `<div style="display:flex;gap:8px;align-items:center;"><button class="btn-small danger" onclick="stopSession('${task.id}', '${session.id}')" style="padding:4px 8px;">Stop</button><button class="btn-small" onclick="openSessionNotes('${task.id}','${session.id}')">Notes</button><button class="btn-icon" title="Open floating session window" onclick="event.stopPropagation(); toggleFloatingSession('${task.id}', '${session.id}')">ℹ️</button></div>`}
                                     </div>
                                 `;
             }).join('')}
@@ -1338,8 +1338,9 @@ function renderProjectContent() {
 
     document.getElementById('content').innerHTML = html;
     updateKebabMenuItems(); // Update kebab menu when content is rendered
-}
+    applyMobileSessionVisibility();
 
+}
 function openNewProjectModal() {
     document.getElementById('projectNameInput').value = '';
     document.getElementById('projectDescInput').value = '';
@@ -1867,7 +1868,7 @@ async function openFloatingSession(taskId, sessionId) {
             </div>
             <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
                 <button class="btn-secondary" id="pip-open-btn-${sessionId}">Open</button>
-                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small" id="pip-stop-btn-${sessionId}" style="background: var(--color-warning); color:#fff;">Stop</button>`}
+                ${session.endedAt ? `<button class="btn-small danger" id="pip-delete-btn-${sessionId}">Delete</button>` : `<button class="btn-small danger" id="pip-stop-btn-${sessionId}" style="background: var(--color-warning); color: var(--color-error);">Stop</button>`}
             </div>
         </div>
     `;
@@ -2698,5 +2699,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (backdrop) {
     backdrop.addEventListener('click', () => toggleMobileSidebar(true));
+  }
+});
+
+function applyMobileSessionVisibility() {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+  document.querySelectorAll('.started-info, .ended-info').forEach(el => {
+    if (isMobile) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', applyMobileSessionVisibility);
+
+// Run on resize
+window.addEventListener('resize', applyMobileSessionVisibility);
+ 
+const sessionObserver = new MutationObserver(() => {
+  applyMobileSessionVisibility();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const content = document.getElementById('content');
+  if (content) {
+    sessionObserver.observe(content, { childList: true, subtree: true });
   }
 });
