@@ -7,14 +7,22 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
     <title>Login - Project Manager</title>
-    <link id="theme-stylesheet" rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <link id="theme-stylesheet" rel="stylesheet" href="light-theme.css">
     <style>
+        html, body {
+            font-family: 'Space Mono', monospace;
+            background: var(--color-bg-light);
+            color: var(--color-text-dark);
+            height: 100%;
+        }
         .login-container {
+            
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-bg);
+            background: var(--color-bg-light);
             padding: 20px;
         }
 
@@ -29,6 +37,13 @@
             /* wider to accommodate two columns */
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+        }
+        /* Login page only – card definition */
+        .login-card {
+        border: 1px solid var(--color-border);
+        box-shadow:
+            0 0 0 1px rgba(0, 0, 0, 0.02),
+            0 8px 24px rgba(0, 0, 0, 0.08);
         }
 
         .login-grid {
@@ -140,8 +155,8 @@
         .login-btn {
             width: 100%;
             padding: 14px 24px;
-            background: var(--color-primary);
-            color: white;
+            background: var(--color-bg-card);
+            color: var(--color-text-dark);
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -212,13 +227,13 @@
         }
 
         /* Dark theme adjustments */
-        @media (prefers-color-scheme: dark) {
+        /* @media (prefers-color-scheme: dark) {
             .login-error {
                 background: #451a1a;
                 border-color: #7f1d1d;
                 color: #fca5a5;
             }
-        }
+        } */
     </style>
 </head>
 
@@ -227,7 +242,7 @@
         <div class="login-card">
             <div class="login-grid">
                 <div class="login-features">
-                    <h2>Data Storage</h2>
+                    <h1>Data Storage</h1>
                     <p style="color:var(--color-text-light); margin:0;">Where your data lives:</p>
                     <ul class="storage-list" aria-hidden="false">
                         <li>
