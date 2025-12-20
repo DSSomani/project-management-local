@@ -1576,7 +1576,9 @@ input[type="reset"],
     color: var(--color-text-light);
     font-size: 13px;
 }
-
+.btn-icon {
+  color: var(--color-text-dark);
+}
 /* Add Habit Button in Category */
 .btn-add-habit {
     display: flex;
