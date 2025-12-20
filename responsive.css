@@ -132,7 +132,7 @@
 
   /* Disable desktop collapse mechanics */
   .sidebar.collapsed {
-    width: 280px;
+    width: 320px;
     padding: var(--space-20);
   }
 
