@@ -854,9 +854,22 @@ input[type="reset"],
 }
 
 .task-description.expanded {
+    display: flex;
     max-height: 500px;
     overflow-y: auto;
     opacity: 1;
+    overflow-x: hidden;       /* prevent horizontal scroll */
+    white-space: pre-wrap;    /* preserve line breaks */
+    word-break: break-word;   /* break long words */
+    padding-right: 6px;  
+}
+.task-description.expanded::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-description.expanded::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
 }
 
 .task-description-content h1,

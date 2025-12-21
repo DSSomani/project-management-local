@@ -24,7 +24,24 @@
   .container {
     flex-direction: column;
   }
+  .task-description.expanded {
+    display: flex;
+    max-height: 160px;        /* adjust if needed */
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding-right: 6px;
+  }
 
+   .task-description.expanded::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .task-description.expanded::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.35);
+    border-radius: 4px;
+  }
   /* Sidebar becomes overlay */
   .sidebar {
     position: fixed;
