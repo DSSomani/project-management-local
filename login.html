@@ -9,6 +9,7 @@
     <title>Login - Project Manager</title>
     <link rel="stylesheet" href="styles.css">
     <link id="theme-stylesheet" rel="stylesheet" href="light-theme.css">
+    <link rel="stylesheet" href="responsive.css">
     <style>
         html, body {
             font-family: 'Space Mono', monospace;
@@ -28,7 +29,7 @@
 
         /* Wider card with a two-column split layout */
         .login-card {
-            background: var(--color-surface);
+            background: var(--color-bg-white);
             border-radius: 12px;
             padding: 0;
             /* grid children will handle spacing */
@@ -101,7 +102,7 @@
         /* Right column: keep existing form layout exactly as-is */
         .login-form-wrap {
             padding: 40px;
-            background: var(--color-surface);
+            background: var(--color-bg-white);
             min-width: 300px;
         }
 
@@ -112,7 +113,7 @@
 
         .login-header h1 {
             font-size: 28px;
-            color: var(--color-text);
+            color: var(--color-text-dark);
             margin: 0 0 8px 0;
         }
 
@@ -130,7 +131,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--color-text);
+            color: var(--color-text-dark);
             font-size: 14px;
         }
 
@@ -140,8 +141,8 @@
             border: 1px solid var(--color-border);
             border-radius: 8px;
             font-size: 16px;
-            background: var(--color-bg);
-            color: var(--color-text);
+            background: var(--color-bg-white);
+            color: var(--color-text-dark);
             transition: border-color 0.2s, box-shadow 0.2s;
             box-sizing: border-box;
         }
@@ -155,18 +156,19 @@
         .login-btn {
             width: 100%;
             padding: 14px 24px;
-            background: var(--color-bg-card);
+            background: var(--color-bg-white);
             color: var(--color-text-dark);
-            border: none;
+            border: 1px solid var(--color-border) !important;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
+
         }
 
         .login-btn:hover {
-            background: var(--color-primary-hover);
+            background: var(--color-bg-light);
         }
 
         .login-btn:active {
@@ -377,7 +379,7 @@
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             const stylesheet = document.getElementById('theme-stylesheet');
-            stylesheet.href = savedTheme === 'dark' ? 'dark-theme.css' : 'styles.css';
+            stylesheet.href = savedTheme === 'dark' ? 'dark-theme.css' : 'light-theme.css';
         }
 
         // On page load
