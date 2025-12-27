@@ -2037,12 +2037,24 @@ function makeFloatingDraggable(el) {
     });
 }
 
-// Close modals on Escape key
+// Close modals on Escape key and handle keyboard shortcuts
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal.active').forEach(m => {
             m.classList.remove('active');
         });
+    }
+    
+    // Ctrl+T to add new task
+    if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        openNewTaskModal();
+    }
+
+    // Ctrl+N to add new Note
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        createNote();
     }
 });
 

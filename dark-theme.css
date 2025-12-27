@@ -2,6 +2,7 @@
 :root {
     /* Primary Colors - GitHub Blue */
     --color-primary: #1f6feb;
+    --color-primary-bright: #3291ff;
     --color-primary-hover: #388bfd;
 
     /* Background Colors */
